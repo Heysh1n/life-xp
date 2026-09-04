@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/lbel=Modrinth&logo=modrinth)](hife-xp?color=00AF5C&lattps://modrinth.com)
-[![GitHub Release](https://img.shields.io/github/v/release/Heysh1n/life-xp?color=informational&logo=github&label=GitHub)](https://github.com/Heysh1n/LIFE-XP-Challenge/releases)w
+[![GitHub Release](https://img.shields.io/github/v/release/Heysh1n/life-xp?color=informational&logo=github&label=GitHub)](https://github.com/Heysh1n/life-xp/releases)
 
 *Survive, scale, and conquer. Turn your experience points into your most vital survival resource.*
 
