@@ -1,0 +1,5 @@
+task printConfigs {
+    doLast {
+        configurations.each { println it.name }
+    }
+}

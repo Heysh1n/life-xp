@@ -1,0 +1,26 @@
+{
+  "parent": "life_xp_challenge:main/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:experience_bottle"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.level_100.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.level_100.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reached": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "function": "life_xp_challenge:rewards/level_100"
+  }
+}

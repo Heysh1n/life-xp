@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.hs1n.lifeXp_challenge.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "MixinAnvilScreen",
+    "MixinFogRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

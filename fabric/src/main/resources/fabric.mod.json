@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "life_xp_challenge",
+  "version": "${version}",
+  "name": "LIFE-XP Challenge",
+  "description": "A hardcore mod that links player attributes to their XP level. Collect XP to become stronger, but beware of death!",
+  "authors": ["heysh1n"],
+  "contact": {
+    "sources": "https://github.com/Heysh1n/life-xp",
+    "issues": "https://github.com/Heysh1n/life-xp/issues"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.hs1n.lifeXp_challenge.fabric.LifeXpChallengeFabric"
+    ],
+    "client": [
+      "com.hs1n.lifeXp_challenge.fabric.client.LifeXpChallengeClientFabric"
+    ],
+    "modmenu": [
+      "com.hs1n.lifeXp_challenge.client.config.LifeXpModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "life_xp_challenge.mixins.json",
+    {
+      "config": "life_xp_challenge.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.21.1",
+    "modmenu": ">=11.0.3",
+    "architectury": "*"
+  }
+}

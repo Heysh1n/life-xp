@@ -1,0 +1,55 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+repositories {
+    maven { url "https://maven.neoforged.net/releases/" }
+    maven { url "https://maven.isxander.dev/releases" }
+    maven { url "https://thedarkcolour.github.io/KotlinForForge/" }
+}
+
+dependencies {
+    neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
+    modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
+
+//    modImplementation "dev.isxander:yet-another-config-lib:3.6.1+1.21-neoforge"
+//    modImplementation "dev.isxander:yet-another-config-lib:3.6.1+1.21-neoforge"
+    forgeRuntimeLibrary "org.quiltmc.parsers:json:0.2.1"
+
+    forgeRuntimeLibrary "org.quiltmc.parsers:gson:0.2.1"
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier.set("dev-shadow")
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    archiveClassifier.set("neoforge")
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/neoforge.mods.toml") {
+        expand "version": project.version
+    }
+}

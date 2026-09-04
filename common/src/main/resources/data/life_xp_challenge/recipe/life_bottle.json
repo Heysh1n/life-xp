@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "ECE",
+    " B "
+  ],
+  "key": {
+    "T": { "item": "minecraft:totem_of_undying" },
+    "E": { "item": "minecraft:ender_eye" },
+    "C": { "item": "minecraft:bundle" },
+    "B": { "item": "minecraft:glass_bottle" }
+  },
+  "result": {
+    "count": 1,
+    "id": "life_xp_challenge:life_bottle"
+  }
+}

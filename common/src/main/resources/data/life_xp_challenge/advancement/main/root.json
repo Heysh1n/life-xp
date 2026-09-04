@@ -1,0 +1,22 @@
+{
+  "display": {
+    "icon": {
+      "id": "life_xp_challenge:life_bottle"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.root.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.root.desc"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/end.png",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "init": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+task printLoom {
+    doLast {
+        println loom.platform.get()
+    }
+}

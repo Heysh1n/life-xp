@@ -1,0 +1,39 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="life_xp_challenge"
+version="${version}"
+displayName="LIFE-XP Challenge"
+authors="heysh1n"
+description="A hardcore mod that links player attributes to their XP level. Collect XP to become stronger, but beware of death!"
+logoFile="assets/life_xp_challenge/icon.png"
+issueTrackerURL="https://github.com/Heysh1n/life-xp"
+
+[[dependencies."life_xp_challenge"]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies."life_xp_challenge"]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.1,1.22)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies."life_xp_challenge"]]
+    modId="architectury"
+    type="required"
+    versionRange="[13.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[mixins]]
+config="life_xp_challenge.mixins.json"
+
+[[mixins]]
+config="life_xp_challenge.client.mixins.json"
