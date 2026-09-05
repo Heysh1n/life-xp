@@ -26,6 +26,9 @@ public class LifeXpConfig {
     private double fogEndDistance = 128.0;
     private boolean enableXpShield = true;
     private int xpShieldPointsPerDamage = 10;
+    private double xpShieldAbsorptionPercent = 0.5;
+    private double xpShieldPerfectBlockChance = 0.1;
+    private double xpShieldPerfectBlockCost = 0.1;
 
     private final Map<String, AttributeConfigNode> nodes = new LinkedHashMap<>();
 
@@ -73,6 +76,12 @@ public class LifeXpConfig {
     public void setEnableXpShield(boolean enable) { this.enableXpShield = enable; }
     public int getXpShieldPointsPerDamage() { return xpShieldPointsPerDamage; }
     public void setXpShieldPointsPerDamage(int points) { this.xpShieldPointsPerDamage = Math.max(1, points); }
+    public double getXpShieldAbsorptionPercent() { return xpShieldAbsorptionPercent; }
+    public void setXpShieldAbsorptionPercent(double p) { this.xpShieldAbsorptionPercent = Math.max(0.0, Math.min(1.0, p)); }
+    public double getXpShieldPerfectBlockChance() { return xpShieldPerfectBlockChance; }
+    public void setXpShieldPerfectBlockChance(double c) { this.xpShieldPerfectBlockChance = Math.max(0.0, Math.min(1.0, c)); }
+    public double getXpShieldPerfectBlockCost() { return xpShieldPerfectBlockCost; }
+    public void setXpShieldPerfectBlockCost(double c) { this.xpShieldPerfectBlockCost = Math.max(0.0, Math.min(1.0, c)); }
     public double getFogEndDistance() { return fogEndDistance; }
     public void setFogEndDistance(double fogEndDistance) { this.fogEndDistance = fogEndDistance; }
 
@@ -95,6 +104,9 @@ public class LifeXpConfig {
                     if (root.has("fogEndDistance")) config.setFogEndDistance(root.get("fogEndDistance").getAsDouble());
                     if (root.has("enableXpShield")) config.setEnableXpShield(root.get("enableXpShield").getAsBoolean());
                     if (root.has("xpShieldPointsPerDamage")) config.setXpShieldPointsPerDamage(root.get("xpShieldPointsPerDamage").getAsInt());
+                    if (root.has("xpShieldAbsorptionPercent")) config.setXpShieldAbsorptionPercent(root.get("xpShieldAbsorptionPercent").getAsDouble());
+                    if (root.has("xpShieldPerfectBlockChance")) config.setXpShieldPerfectBlockChance(root.get("xpShieldPerfectBlockChance").getAsDouble());
+                    if (root.has("xpShieldPerfectBlockCost")) config.setXpShieldPerfectBlockCost(root.get("xpShieldPerfectBlockCost").getAsDouble());
                     if (root.has("attributes")) {
                         JsonObject attrs = root.getAsJsonObject("attributes");
                         for (Map.Entry<String, AttributeConfigNode> entry : config.nodes.entrySet()) {
@@ -128,6 +140,9 @@ public class LifeXpConfig {
         root.addProperty("fogEndDistance", INSTANCE.fogEndDistance);
         root.addProperty("enableXpShield", INSTANCE.enableXpShield);
         root.addProperty("xpShieldPointsPerDamage", INSTANCE.xpShieldPointsPerDamage);
+        root.addProperty("xpShieldAbsorptionPercent", INSTANCE.xpShieldAbsorptionPercent);
+        root.addProperty("xpShieldPerfectBlockChance", INSTANCE.xpShieldPerfectBlockChance);
+        root.addProperty("xpShieldPerfectBlockCost", INSTANCE.xpShieldPerfectBlockCost);
 
         JsonObject attrs = new JsonObject();
         for (Map.Entry<String, AttributeConfigNode> entry : INSTANCE.nodes.entrySet()) {

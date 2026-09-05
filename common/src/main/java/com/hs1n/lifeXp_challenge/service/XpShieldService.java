@@ -18,18 +18,31 @@ public class XpShieldService {
             return amount;
         }
 
-        int xpPerDamage = cfg.getXpShieldPointsPerDamage();
         int totalXp = ExperienceUtils.getPlayerTotalXp(player);
         if (totalXp <= 0) {
             return amount;
         }
 
-        // Вычисляем, сколько урона мы можем впитать
-        float maxAbsorbableDamage = (float) totalXp / xpPerDamage;
-        float damageToAbsorb = Math.min(amount, maxAbsorbableDamage);
+        double chance = cfg.getXpShieldPerfectBlockChance();
+        boolean perfectBlock = (chance > 0) && (player.getRandom().nextDouble() < chance);
+
+        int xpToDeduct;
+        float damageToAbsorb;
+
+        if (perfectBlock) {
+            // Идеальный блок: поглощает весь урон, но стоит % от всего опыта
+            damageToAbsorb = amount;
+            xpToDeduct = (int) Math.ceil(totalXp * cfg.getXpShieldPerfectBlockCost());
+        } else {
+            // Обычное поглощение: поглощает только % от урона, стоит фиксированно за единицу урона
+            int xpPerDamage = cfg.getXpShieldPointsPerDamage();
+            float targetAbsorb = amount * (float) cfg.getXpShieldAbsorptionPercent();
+            float maxAbsorbableDamage = (float) totalXp / xpPerDamage;
+            damageToAbsorb = Math.min(targetAbsorb, maxAbsorbableDamage);
+            xpToDeduct = (int) Math.ceil(damageToAbsorb * xpPerDamage);
+        }
 
         if (damageToAbsorb > 0) {
-            int xpToDeduct = (int) Math.ceil(damageToAbsorb * xpPerDamage);
             int newXp = Math.max(0, totalXp - xpToDeduct);
             
             // Устанавливаем новый опыт
@@ -40,8 +53,12 @@ public class XpShieldService {
             // Пересчитываем атрибуты после изменения опыта
             AttributeService.recalculate(player);
 
-            // Воспроизводим звук энергетического щита (как ломающийся щит или магия)
-            player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.7f, 1.2f);
+            // Воспроизводим звук энергетического щита
+            if (perfectBlock) {
+                player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.5f);
+            } else {
+                player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.7f, 1.2f);
+            }
             
             // Оставшийся урон, который пройдет по здоровью
             return amount - damageToAbsorb;

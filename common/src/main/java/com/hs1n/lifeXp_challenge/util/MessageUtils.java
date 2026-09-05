@@ -13,7 +13,7 @@ public final class MessageUtils {
     private MessageUtils() {}
 
     public static MutableComponent prefix() {
-        return Component.literal("[LIFE-XP Challenge] ").withStyle(ChatFormatting.GOLD);
+        return Component.translatable("lifexp.message.prefix").withStyle(ChatFormatting.GOLD);
     }
 
     public static MutableComponent info(String translationKey, Object... args) {

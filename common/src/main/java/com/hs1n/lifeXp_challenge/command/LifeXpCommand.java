@@ -50,6 +50,30 @@ public final class LifeXpCommand {
                                         String.valueOf(LifeXpConfig.INSTANCE.getMaxLevel()))))
                         .then(Commands.literal("xpShieldEnable")
                                 .executes(ctx -> executeGetSimple(ctx, "xpShieldEnable", String.valueOf(LifeXpConfig.INSTANCE.isEnableXpShield()))))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldAbsorptionPercent(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockChance(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockCost(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()));
+                                        })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()))))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()))))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()))))
                         .then(Commands.literal("xpShieldPoints")
                                 .executes(ctx -> executeGetSimple(ctx, "xpShieldPoints", String.valueOf(LifeXpConfig.INSTANCE.getXpShieldPointsPerDamage()))))
                         .then(Commands.literal("xpShieldEnable")
@@ -58,6 +82,30 @@ public final class LifeXpCommand {
                                             LifeXpConfig.INSTANCE.setEnableXpShield(BoolArgumentType.getBool(ctx, "value"));
                                             return saveAndNotify(ctx, "xpShieldEnable", String.valueOf(LifeXpConfig.INSTANCE.isEnableXpShield()));
                                         })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldAbsorptionPercent(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockChance(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockCost(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()));
+                                        })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()))))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()))))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()))))
                         .then(Commands.literal("xpShieldPoints")
                                 .then(Commands.argument("value", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
@@ -94,6 +142,30 @@ public final class LifeXpCommand {
                                         .executes(LifeXpCommand::executeSetMaxLevel)))
                         .then(Commands.literal("xpShieldEnable")
                                 .executes(ctx -> executeGetSimple(ctx, "xpShieldEnable", String.valueOf(LifeXpConfig.INSTANCE.isEnableXpShield()))))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldAbsorptionPercent(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockChance(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockCost(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()));
+                                        })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()))))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()))))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()))))
                         .then(Commands.literal("xpShieldPoints")
                                 .executes(ctx -> executeGetSimple(ctx, "xpShieldPoints", String.valueOf(LifeXpConfig.INSTANCE.getXpShieldPointsPerDamage()))))
                         .then(Commands.literal("xpShieldEnable")
@@ -102,6 +174,30 @@ public final class LifeXpCommand {
                                             LifeXpConfig.INSTANCE.setEnableXpShield(BoolArgumentType.getBool(ctx, "value"));
                                             return saveAndNotify(ctx, "xpShieldEnable", String.valueOf(LifeXpConfig.INSTANCE.isEnableXpShield()));
                                         })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldAbsorptionPercent(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockChance(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()));
+                                        })))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                        .executes(ctx -> {
+                                            LifeXpConfig.INSTANCE.setXpShieldPerfectBlockCost(DoubleArgumentType.getDouble(ctx, "value"));
+                                            return saveAndNotify(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()));
+                                        })))
+                        .then(Commands.literal("xpShieldAbsorb")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldAbsorb", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldAbsorptionPercent()))))
+                        .then(Commands.literal("xpShieldBlockChance")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockChance", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockChance()))))
+                        .then(Commands.literal("xpShieldBlockCost")
+                                .executes(ctx -> executeGetSimple(ctx, "xpShieldBlockCost", String.format("%.2f", LifeXpConfig.INSTANCE.getXpShieldPerfectBlockCost()))))
                         .then(Commands.literal("xpShieldPoints")
                                 .then(Commands.argument("value", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
@@ -310,12 +406,12 @@ public final class LifeXpCommand {
 
     private static int executeExport(CommandContext<CommandSourceStack> ctx) {
         String json = LifeXpConfig.exportToJsonString();
-        ctx.getSource().sendSuccess(() -> prefix().append(Component.literal("Конфиг экспортирован! Нажмите, чтобы скопировать.")
+        ctx.getSource().sendSuccess(() -> prefix().append(Component.translatable("lifexp.command.export.success")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GREEN)
                         .withUnderlined(true)
                         .withClickEvent(new net.minecraft.network.chat.ClickEvent(net.minecraft.network.chat.ClickEvent.Action.COPY_TO_CLIPBOARD, json))
-                        .withHoverEvent(new net.minecraft.network.chat.HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.literal("Нажмите для копирования JSON"))))), false);
+                        .withHoverEvent(new net.minecraft.network.chat.HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.translatable("lifexp.command.export.hover"))))), false);
         return 1;
     }
 
@@ -323,11 +419,11 @@ public final class LifeXpCommand {
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>(ctx.getSource().getServer().getPlayerList().getPlayers());
         players.sort((p1, p2) -> Integer.compare(p2.experienceLevel, p1.experienceLevel));
 
-        ctx.getSource().sendSuccess(() -> Component.literal("--- Топ игроков LifeXP (Онлайн) ---").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
+        ctx.getSource().sendSuccess(() -> Component.translatable("lifexp.command.top.header").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
         int rank = 1;
         for (ServerPlayer player : players) {
             final int currentRank = rank;
-            ctx.getSource().sendSuccess(() -> Component.literal(currentRank + ". " + player.getScoreboardName() + " - Lvl " + player.experienceLevel)
+            ctx.getSource().sendSuccess(() -> Component.translatable("lifexp.command.top.entry", currentRank, player.getScoreboardName(), player.experienceLevel)
                     .withStyle(currentRank <= 3 ? ChatFormatting.YELLOW : ChatFormatting.WHITE), false);
             rank++;
             if (rank > 10) break;
@@ -336,7 +432,7 @@ public final class LifeXpCommand {
     }
 
     private static MutableComponent prefix() {
-        return Component.literal("[LIFE-XP] ").withStyle(ChatFormatting.GOLD);
+        return Component.translatable("lifexp.message.prefix_short").withStyle(ChatFormatting.GOLD);
     }
 
     private static int saveAndNotify(CommandContext<CommandSourceStack> ctx, String param, String value) {
