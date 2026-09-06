@@ -127,5 +127,8 @@
   "item.life_xp_challenge.shield_core.desc": "Used for brewing Potion of XP Shield in a brewing stand",
   "item.life_xp_challenge.dynamic_xp_bottle.desc": "Shift + Right Click: store XP (10% tax). Right Click: retrieve XP",
   "item.life_xp_challenge.life_bottle.desc": "Saves inventory upon death. Shift + Right Click: equip items back",
-  "lifexp.tooltip.hold_shift": "Hold Shift for details"
+  "lifexp.tooltip.hold_shift": "Hold Shift for details",
+  "jei.life_xp_challenge.life_bottle.info": "The Life Bottle saves your entire inventory (41 slots, including armor and offhand) upon death, even from falling into the End Void. It has 3 points of durability (3 uses). After respawning, Shift + Right Click with the bottle in hand to restore all saved equipment directly into their original inventory slots.",
+  "jei.life_xp_challenge.dynamic_xp_bottle.info": "The Dynamic XP Bottle allows storing experience points safely. Hold Shift + Right Click to gradually channel XP levels from the player into the bottle (with a 10% tax). Normal Right Click instantly absorbs all stored XP points back with no loss, returning an empty glass bottle.",
+  "jei.life_xp_challenge.shield_core.info": "The Shield Core is brewed in a brewing stand with an Awkward Potion to create the Potion of XP Shield. The effect absorbs incoming damage using the player's experience points: Level I — 25%, Level II — 50%, Level III+ — 75% absorption. Redstone extends duration, and Glowstone increases the potion amplifier."
 }

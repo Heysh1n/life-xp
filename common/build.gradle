@@ -5,9 +5,12 @@ architectury {
 repositories {
     maven { url "https://maven.isxander.dev/releases" }
     maven { url "https://maven.terraformersmc.com/" }
+    maven { url "https://maven.blamejared.com/" }
 }
 
 dependencies {
     modImplementation "dev.architectury:architectury:${rootProject.architectury_version}"
     modCompileOnly "dev.isxander:yet-another-config-lib:3.6.1+1.21-fabric"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.21.0.246"
+    compileOnly "dev.emi:emi-xplat-mojmap:1.1.24+1.21.1:api"
 }

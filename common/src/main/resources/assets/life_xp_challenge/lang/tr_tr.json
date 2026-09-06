@@ -118,5 +118,8 @@
   "item.life_xp_challenge.shield_core.desc": "İksir standında XP Kalkanı İksiri demlemek için kullanılır",
   "item.life_xp_challenge.dynamic_xp_bottle.desc": "Shift + Sağ Tık: XP depola (%%10 vergi). Sağ Tık: XP al",
   "item.life_xp_challenge.life_bottle.desc": "Ölümde envanteri kaydeder. Shift + Sağ Tık: eşyaları geri kuşan",
-  "lifexp.tooltip.hold_shift": "Ayrıntılar için Shift'e basılı tutun"
+  "lifexp.tooltip.hold_shift": "Ayrıntılar için Shift'e basılı tutun",
+  "jei.life_xp_challenge.life_bottle.info": "Yaşam Şişesi, oyuncu öldüğünde (End Boşluğuna düşme dahil) tüm envanteri (zırh ve sol el dahil 41 yuva) korur. 3 dayanıklılık puanına (3 kullanım) sahiptir. Yeniden doğduktan sonra, kaydedilen tüm teçhizatı orijinal envanter yuvalarına geri yüklemek için elinizde şişeyle Shift + Sağ Tık yapın.",
+  "jei.life_xp_challenge.dynamic_xp_bottle.info": "Dinamik XP Şişesi, deneyim puanlarını güvenli bir şekilde saklamanızı sağlar. Oyuncunun XP seviyelerini şişeye kademeli olarak aktarmak için Shift + Sağ Tık basılı tutun (%%10 vergi kesilir). Normal Sağ Tık, depolanan tüm XP puanlarını kayıpsız anında geri emer ve boş bir cam şişe bırakır.",
+  "jei.life_xp_challenge.shield_core.info": "Kalkan Çekirdeği, iksir standında Tuhaf İksir (Awkward Potion) ile kaynatılarak XP Kalkanı İksiri oluşturulur. Efekt, gelen hasarı oyuncunun deneyim puanlarıyla emer: Seviye I — %%25, Seviye II — %%50, Seviye III+ — %%75 emilim. Kızıltaş süreyi uzatır, Işıktaşı ise iksir seviyesini artırır."
 }

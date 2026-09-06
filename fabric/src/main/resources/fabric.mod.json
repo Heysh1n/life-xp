@@ -21,6 +21,12 @@
     ],
     "modmenu": [
       "com.hs1n.lifeXp_challenge.client.config.LifeXpModMenuIntegration"
+    ],
+    "jei_mod_plugin": [
+      "com.hs1n.lifeXp_challenge.compat.jei.LifeXpJeiPlugin"
+    ],
+    "emi": [
+      "com.hs1n.lifeXp_challenge.compat.emi.LifeXpEmiPlugin"
     ]
   },
   "mixins": [
