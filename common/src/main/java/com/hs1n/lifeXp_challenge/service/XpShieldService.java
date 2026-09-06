@@ -1,67 +1,65 @@
 package com.hs1n.lifeXp_challenge.service;
 
+import com.hs1n.lifeXp_challenge.registry.ModMobEffects;
 import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class XpShieldService {
 
-    // Сколько очков опыта сжигается за 1 единицу урона (1 единица урона = 0.5 сердечка)
-    private static final int XP_PER_DAMAGE = 10; 
-
     public static float absorbDamage(ServerPlayer player, DamageSource source, float amount) {
-        com.hs1n.lifeXp_challenge.config.LifeXpConfig cfg = com.hs1n.lifeXp_challenge.config.LifeXpConfig.INSTANCE;
-        if (!cfg.isEnableXpShield() || amount <= 0 || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+        if (amount <= 0.0f || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return amount;
         }
 
-        int totalXp = ExperienceUtils.getPlayerTotalXp(player);
-        if (totalXp <= 0) {
+        // Поглощение урона срабатывает ТОЛЬКО если на игроке висит эффект xp_shield
+        MobEffectInstance effect = player.getEffect(ModMobEffects.XP_SHIELD);
+        if (effect == null) {
             return amount;
         }
 
-        double chance = cfg.getXpShieldPerfectBlockChance();
-        boolean perfectBlock = (chance > 0) && (player.getRandom().nextDouble() < chance);
+        long totalXp = ExperienceUtils.getPlayerTotalXp(player);
+        if (totalXp <= 0L) {
+            return amount;
+        }
 
-        int xpToDeduct;
-        float damageToAbsorb;
-
-        if (perfectBlock) {
-            // Идеальный блок: поглощает весь урон, но стоит % от всего опыта
-            damageToAbsorb = amount;
-            xpToDeduct = (int) Math.ceil(totalXp * cfg.getXpShieldPerfectBlockCost());
+        // Математика скейлинга поглощения:
+        // Уровень I   (amplifier 0):  25%
+        // Уровень II  (amplifier 1):  50%
+        // Уровень III+ (amplifier 2+): 75%
+        int amplifier = effect.getAmplifier();
+        float absorbPercent;
+        if (amplifier <= 0) {
+            absorbPercent = 0.25f;
+        } else if (amplifier == 1) {
+            absorbPercent = 0.50f;
         } else {
-            // Обычное поглощение: поглощает только % от урона, стоит фиксированно за единицу урона
-            int xpPerDamage = cfg.getXpShieldPointsPerDamage();
-            float targetAbsorb = amount * (float) cfg.getXpShieldAbsorptionPercent();
-            float maxAbsorbableDamage = (float) totalXp / xpPerDamage;
-            damageToAbsorb = Math.min(targetAbsorb, maxAbsorbableDamage);
-            xpToDeduct = (int) Math.ceil(damageToAbsorb * xpPerDamage);
+            absorbPercent = 0.75f;
         }
 
-        if (damageToAbsorb > 0) {
-            int newXp = Math.max(0, totalXp - xpToDeduct);
-            
-            // Устанавливаем новый опыт
-            player.setExperienceLevels(0);
-            player.setExperiencePoints(0);
-            player.giveExperiencePoints(newXp);
-            
-            // Пересчитываем атрибуты после изменения опыта
-            AttributeService.recalculate(player);
+        float targetAbsorb = amount * absorbPercent;
 
-            // Воспроизводим звук энергетического щита
-            if (perfectBlock) {
-                player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.5f);
-            } else {
-                player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.7f, 1.2f);
-            }
-            
-            // Оставшийся урон, который пройдет по здоровью
-            return amount - damageToAbsorb;
+        // Опыт сжигается эквивалентно поглощенному урону.
+        // Если опыта не хватает, сгорает всё до 0, а остаток урона бьет по здоровью.
+        float maxAbsorbable = (float) totalXp;
+        float damageToAbsorb = Math.max(0.0f, Math.min(targetAbsorb, maxAbsorbable));
+
+        long xpToDeduct = (long) Math.ceil((double) damageToAbsorb);
+        xpToDeduct = Math.max(0L, Math.min(totalXp, xpToDeduct));
+
+        if (damageToAbsorb > 0.0f && xpToDeduct > 0L) {
+            long newXp = Math.max(0L, totalXp - xpToDeduct);
+            newXp = Math.min(totalXp, newXp);
+
+            ExperienceUtils.setPlayerTotalXp(player, newXp);
+
+            player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.7f, 1.2f);
+
+            return Math.max(0.0f, amount - damageToAbsorb);
         }
 
         return amount;

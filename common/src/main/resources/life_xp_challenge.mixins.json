@@ -10,7 +10,8 @@
     "MixinItem",
     "MixinPlayer",
     "MixinServerPlayer",
-    "PlayerDamageMixin"
+    "PlayerDamageMixin",
+    "PotionBrewingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

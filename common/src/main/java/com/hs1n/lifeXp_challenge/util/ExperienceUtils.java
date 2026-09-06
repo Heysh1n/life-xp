@@ -4,16 +4,16 @@ import com.hs1n.lifeXp_challenge.service.AttributeService;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Утилита для точной нелинейной работы с очками опыта Minecraft.
- * Корректно рассчитывает полный опыт из уровней и прогресса без использования
- * устаревшего или забагованного totalExperience.
+ * Утилита для точной нелинейной работы с очками опыта Minecraft в O(1).
+ * Корректно рассчитывает полный опыт из уровней и прогресса без циклов,
+ * предотвращая Watchdog Crash и переполнение 32-битного Integer при высоких уровнях.
  */
 public final class ExperienceUtils {
 
     private ExperienceUtils() {}
 
     /**
-     * Возвращает количество очков опыта, необходимое для перехода с текущего уровня на следующий.
+     * Возвращает количество очков опыта, необходимое для перехода с текущего уровня на следующий (O(1)).
      */
     public static int getXpNeededToLevelUp(int level) {
         if (level >= 30) {
@@ -21,86 +21,117 @@ public final class ExperienceUtils {
         } else if (level >= 15) {
             return 37 + (level - 15) * 5;
         } else {
-            return 7 + level * 2;
+            return 7 + Math.max(0, level) * 2;
         }
     }
 
     /**
-     * Возвращает общее количество очков опыта от 0 до заданного уровня.
+     * Возвращает общее количество очков опыта от 0 до заданного уровня в O(1).
      * Формула для уровня L:
      * L >= 32: 4.5*L^2 - 162.5*L + 2220
      * L >= 16: 2.5*L^2 - 40.5*L + 360
      * L < 16:  L^2 + 6*L
      */
-    public static int getTotalXpForLevel(int level) {
-        if (level <= 0) return 0;
-        if (level >= 32) {
-            return (int) Math.round(4.5 * level * level - 162.5 * level + 2220);
-        } else if (level >= 16) {
-            return (int) Math.round(2.5 * level * level - 40.5 * level + 360);
+    public static long getTotalXpForLevel(int level) {
+        if (level <= 0) return 0L;
+        long l = level;
+        if (l >= 32) {
+            return Math.round(4.5 * l * l - 162.5 * l + 2220.0);
+        } else if (l >= 16) {
+            return Math.round(2.5 * l * l - 40.5 * l + 360.0);
         } else {
-            return level * level + 6 * level;
+            return l * l + 6L * l;
         }
     }
 
     /**
-     * Возвращает точное суммарное количество очков опыта игрока,
-     * вычисляя его строго из experienceLevel и experienceProgress.
+     * Возвращает точное суммарное количество очков опыта игрока (long),
+     * вычисляя его строго в O(1) из experienceLevel и experienceProgress.
      */
-    public static int getPlayerTotalXp(Player player) {
+    public static long getPlayerTotalXp(Player player) {
+        if (player == null) return 0L;
         int level = player.experienceLevel;
-        if (level < 0) return 0;
+        if (level < 0) return 0L;
 
-        int base = getTotalXpForLevel(level);
-        int progress = Math.round(player.experienceProgress * player.getXpNeededForNextLevel());
-        return Math.max(0, base + progress);
+        long base = getTotalXpForLevel(level);
+        long progress = Math.round((double) Math.max(0.0f, Math.min(1.0f, player.experienceProgress)) * player.getXpNeededForNextLevel());
+        return Math.max(0L, base + progress);
     }
 
     /**
-     * Принудительно устанавливает игроку точное суммарное количество очков опыта
-     * с корректным пересчётом уровня и полосы прогресса.
+     * Расчёт уровня по суммарному пулу очков опыта строго за O(1) без циклов (обратные квадратичные корни).
      */
-    public static void setPlayerTotalXp(Player player, int totalXp) {
-        totalXp = Math.max(0, totalXp);
-        player.totalExperience = totalXp;
-
-        int level = 0;
-        while (getTotalXpForLevel(level + 1) <= totalXp) {
-            level++;
+    public static int calculateLevelFromXp(long totalXp) {
+        if (totalXp <= 0L) return 0;
+        int level;
+        if (totalXp < 352L) {
+            level = (int) Math.floor(Math.sqrt(totalXp + 9.0) - 3.0);
+        } else if (totalXp < 1628L) {
+            level = (int) Math.floor((81.0 + Math.sqrt(40.0 * totalXp - 7839.0)) / 10.0);
+        } else {
+            level = (int) Math.floor((325.0 + Math.sqrt(72.0 * totalXp - 54215.0)) / 18.0);
         }
 
+        // Защитная O(1) проверка краевых условий округления корней
+        if (getTotalXpForLevel(level + 1) <= totalXp) {
+            level++;
+        } else if (level > 0 && getTotalXpForLevel(level) > totalXp) {
+            level--;
+        }
+
+        return Math.max(0, level);
+    }
+
+    /**
+     * Принудительно устанавливает игроку точное суммарное количество очков опыта (long)
+     * с корректным O(1) пересчётом уровня и полосы прогресса.
+     */
+    public static void setPlayerTotalXp(Player player, long totalXp) {
+        if (player == null) return;
+        totalXp = Math.max(0L, totalXp);
+        player.totalExperience = (int) Math.min(Integer.MAX_VALUE, totalXp);
+
+        int level = calculateLevelFromXp(totalXp);
         player.experienceLevel = level;
-        int remainingXp = totalXp - getTotalXpForLevel(level);
+
+        long base = getTotalXpForLevel(level);
+        long remaining = Math.max(0L, totalXp - base);
         int needed = getXpNeededToLevelUp(level);
-        player.experienceProgress = needed > 0 ? (float) remainingXp / (float) needed : 0.0f;
+        player.experienceProgress = needed > 0 ? Math.max(0.0f, Math.min(1.0f, (float) remaining / (float) needed)) : 0.0f;
 
         // Пересчёт атрибутов мода
         AttributeService.recalculate(player);
     }
 
     /**
-     * Вычитает у игрока указанное количество очков опыта.
+     * Перегрузка для int totalXp.
+     */
+    public static void setPlayerTotalXp(Player player, int totalXp) {
+        setPlayerTotalXp(player, (long) Math.max(0, totalXp));
+    }
+
+    /**
+     * Вычитает у игрока указанное количество очков опыта (long).
+     * Никогда не прибавляет опыт и не уходит в отрицательные значения.
      * @return фактически списанное количество очков.
      */
-    public static int deductPlayerXp(Player player, int pointsToDeduct) {
-        if (pointsToDeduct <= 0) return 0;
-        int current = getPlayerTotalXp(player);
-        if (current <= 0) return 0;
+    public static long deductPlayerXp(Player player, long pointsToDeduct) {
+        if (player == null || pointsToDeduct <= 0L) return 0L;
+        long current = getPlayerTotalXp(player);
+        if (current <= 0L) return 0L;
 
-        int toDeduct = Math.min(current, pointsToDeduct);
-        setPlayerTotalXp(player, current - toDeduct);
+        long toDeduct = Math.max(0L, Math.min(current, pointsToDeduct));
+        long newXp = Math.max(0L, current - toDeduct);
+        newXp = Math.min(current, newXp);
+
+        setPlayerTotalXp(player, newXp);
         return toDeduct;
     }
 
     /**
-     * Расчёт уровня по количеству сырых очков опыта.
+     * Перегрузка для обратной совместимости с вызовами, передающими int.
      */
-    public static int calculateLevelFromXp(int totalXp) {
-        if (totalXp <= 0) return 0;
-        int level = 0;
-        while (getTotalXpForLevel(level + 1) <= totalXp) {
-            level++;
-        }
-        return level;
+    public static int deductPlayerXp(Player player, int pointsToDeduct) {
+        return (int) Math.min(Integer.MAX_VALUE, deductPlayerXp(player, (long) pointsToDeduct));
     }
 }

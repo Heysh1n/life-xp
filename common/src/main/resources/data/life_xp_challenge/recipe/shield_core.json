@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EAY",
+    "ADA",
+    "RAR"
+  ],
+  "key": {
+    "D": { "item": "life_xp_challenge:dynamic_xp_bottle" },
+    "A": { "item": "minecraft:amethyst_shard" },
+    "E": { "item": "minecraft:echo_shard" },
+    "Y": { "item": "minecraft:ender_eye" },
+    "R": { "item": "minecraft:blaze_rod" }
+  },
+  "result": {
+    "count": 1,
+    "id": "life_xp_challenge:shield_core"
+  }
+}

@@ -12,11 +12,14 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Сервис пересчёта атрибутов игрока на основе его уровня опыта.
- * Использует кусочно-линейную интерполяцию и операцию ADD_VALUE.
- * Никогда не изменяет BaseValue и SCALE.
+ * Работает строго в O(1).
+ * Кэширует уровень опыта игрока и срабатывает ТОЛЬКО при изменении experienceLevel.
+ * Игнорирует изменения experienceProgress, защищая сервер от Watchdog Crash.
  */
 public final class AttributeService {
 
@@ -24,6 +27,9 @@ public final class AttributeService {
 
     /** Маппинг конфиг-ключ → ванильный Holder<Attribute> (строго 1.21.1). */
     private static final Map<String, Holder<Attribute>> ATTRIBUTE_MAP = new LinkedHashMap<>();
+
+    /** Кэш уровня игрока (UUID -> experienceLevel) для O(1) проверки. */
+    private static final Map<UUID, Integer> LAST_LEVEL_CACHE = new ConcurrentHashMap<>();
 
     static {
         ATTRIBUTE_MAP.put("max_health",               Attributes.MAX_HEALTH);
@@ -45,15 +51,22 @@ public final class AttributeService {
 
     private AttributeService() {}
 
-    // ── Интерполяция ───────────────────────────────────────────
+    /** Очистить кэш для конкретного игрока (при дисконнекте/респавне). */
+    public static void clearCache(UUID uuid) {
+        if (uuid != null) {
+            LAST_LEVEL_CACHE.remove(uuid);
+        }
+    }
+
+    /** Очистить кэш для всех игроков (при смене конфига/пресета). */
+    public static void clearAllCache() {
+        LAST_LEVEL_CACHE.clear();
+    }
+
+    // ── Интерполяция (O(1)) ───────────────────────────────────────
 
     /**
-     * Кусочно-линейная интерполяция с динамическим maxLevel.
-     * <pre>
-     *   level ≤ 0          → startValue
-     *   level = maxLevel/2  → midValue
-     *   level ≥ maxLevel    → endValue
-     * </pre>
+     * Кусочно-линейная интерполяция с динамическим maxLevel (O(1)).
      */
     public static double interpolate(com.hs1n.lifeXp_challenge.config.AttributeConfigNode node, int level, int maxLevel) {
         if (node.getFormulaMode() == com.hs1n.lifeXp_challenge.config.FormulaMode.FORMULA) {
@@ -81,7 +94,7 @@ public final class AttributeService {
     }
 
     /**
-     * Кусочно-линейная интерполяция для произвольных значений (для тумана и т.д.).
+     * Кусочно-линейная интерполяция для произвольных значений (O(1)).
      */
     public static double interpolate(double startVal, double midVal, double endVal, int level, int maxLevel) {
         if (maxLevel <= 0) maxLevel = 1;
@@ -105,15 +118,35 @@ public final class AttributeService {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, "xp_scaling_" + attrKey);
     }
 
-    // ── Применение ─────────────────────────────────────────────
+    // ── Применение (O(1)) ─────────────────────────────────────────
+
+    /**
+     * Стандартный пересчёт атрибутов с проверкой кэша.
+     * Срабатывает ТОЛЬКО если player.experienceLevel действительно изменился.
+     */
+    public static void recalculate(Player player) {
+        recalculate(player, false);
+    }
 
     /**
      * Пересчитать и применить все модификаторы для игрока.
-     * Вызывается при любом изменении опыта, респавне, входе на сервер.
+     * @param force если true, пересчитывает даже если уровень совпадает с кэшем (например, смена конфига или респавн).
      */
-    public static void recalculate(Player player) {
+    public static void recalculate(Player player, boolean force) {
+        if (player == null) return;
+        int level = player.experienceLevel;
+        UUID uuid = player.getUUID();
+
+        if (!force) {
+            Integer cachedLevel = LAST_LEVEL_CACHE.get(uuid);
+            if (cachedLevel != null && cachedLevel == level) {
+                // Уровень не изменился — выходим в O(1), игнорируя опыт-прогресс и не спамя пересчёт
+                return;
+            }
+        }
+        LAST_LEVEL_CACHE.put(uuid, level);
+
         LifeXpConfig config = LifeXpConfig.INSTANCE;
-        int level    = player.experienceLevel;
         int maxLevel = config.getMaxLevel();
 
         for (Map.Entry<String, Holder<Attribute>> entry : ATTRIBUTE_MAP.entrySet()) {

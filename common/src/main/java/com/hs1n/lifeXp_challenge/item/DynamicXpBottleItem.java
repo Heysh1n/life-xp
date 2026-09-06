@@ -2,6 +2,7 @@ package com.hs1n.lifeXp_challenge.item;
 
 import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -154,9 +155,13 @@ public class DynamicXpBottleItem extends Item {
 
         tooltip.add(Component.translatable("lifexp.xp_bottle.stored_points", storedXp, approxLevels)
                 .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
-        tooltip.add(Component.translatable("lifexp.xp_bottle.unpack_desc")
-                .withStyle(ChatFormatting.YELLOW));
-        tooltip.add(Component.translatable("lifexp.xp_bottle.channel_desc")
-                .withStyle(ChatFormatting.GRAY));
+
+        if (Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("item.life_xp_challenge.dynamic_xp_bottle.desc")
+                    .withStyle(ChatFormatting.YELLOW));
+        } else {
+            tooltip.add(Component.translatable("lifexp.tooltip.hold_shift")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
     }
 }

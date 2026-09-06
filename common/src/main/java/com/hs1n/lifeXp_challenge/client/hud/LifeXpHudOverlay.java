@@ -2,97 +2,141 @@ package com.hs1n.lifeXp_challenge.client.hud;
 
 import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import com.hs1n.lifeXp_challenge.service.KillStreakService;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
- * Клиентский HUD-оверлей для LIFE-XP Challenge.
- * Рисует компактную панель в верхнем левом углу экрана:
- *   - Текущий уровень / maxLevel
- *   - Полоска прогресса до maxLevel
- *   - Kill Streak (если > 0)
+ * Графический клиентский HUD-оверлей для LIFE-XP Challenge.
+ * Отрисовывает ряд из 10 сфер прогресса над полоской голода (hunger bar) справа.
+ * Скрывается при F1, F3, а также в режимах Creative и Spectator.
  */
 public class LifeXpHudOverlay {
 
-    private static final int BAR_WIDTH = 80;
-    private static final int BAR_HEIGHT = 5;
-    private static final int PADDING = 4;
-
-    // Цвета (ARGB)
-    private static final int BG_COLOR       = 0xAA000000; // полупрозрачный чёрный
-    private static final int BAR_BG_COLOR   = 0xFF333333; // тёмно-серый
-    private static final int BAR_FILL_COLOR = 0xFF55FF55; // зелёный
-    private static final int BAR_MAX_COLOR  = 0xFFFFD700; // золотой (при maxLevel)
-    private static final int TEXT_COLOR     = 0xFFFFFFFF; // белый
-    private static final int STREAK_COLOR   = 0xFFFF6600; // оранжевый
-
-    public static void render(GuiGraphics graphics, net.minecraft.client.DeltaTracker delta) {
+    public static void render(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.options.hideGui || mc.gui.getDebugOverlay().showDebugScreen()) {
             return;
         }
 
         LocalPlayer player = mc.player;
+        if (player.isSpectator() || player.isCreative()) {
+            return;
+        }
+
         LifeXpConfig config = LifeXpConfig.INSTANCE;
         int maxLevel = config.getMaxLevel();
+        if (maxLevel <= 0) {
+            maxLevel = 1;
+        }
+
         int currentLevel = player.experienceLevel;
+        float progress = (float) currentLevel / (float) maxLevel;
+        int filledCount = Math.clamp((int) (progress * 10.0f), 0, 10);
 
-        // Позиция (верхний левый угол с отступом)
-        int x = 4;
-        int y = 4;
+        int screenWidth = graphics.guiWidth();
+        int screenHeight = graphics.guiHeight();
 
-        // Рассчитываем размеры панели
-        String levelText = "Lvl " + currentLevel + " / " + maxLevel;
-        int textWidth = mc.font.width(levelText);
-        int panelWidth = Math.max(BAR_WIDTH, textWidth) + PADDING * 2;
-        int panelHeight = PADDING + mc.font.lineHeight + 2 + BAR_HEIGHT + PADDING;
+        // Базовая позиция над полоской голода
+        int y = screenHeight - 49;
 
-        // Kill streak текст (если есть)
+        // Смещение при наличии сердец транспорта (лошади и т.д.)
+        if (player.getVehicle() instanceof LivingEntity vehicle) {
+            int maxHearts = (int) Math.ceil((double) vehicle.getMaxHealth() / 2.0);
+            int rows = (int) Math.ceil((double) maxHearts / 10.0);
+            if (rows > 1) {
+                y -= (rows - 1) * 10;
+            }
+        }
+
+        // Смещение, если отображаются пузырьки воздуха (под водой)
+        if (player.isEyeInFluid(FluidTags.WATER) || player.getAirSupply() < player.getMaxAirSupply()) {
+            y -= 10;
+        }
+
+        // 10 иконок над полоской сытости (справа, выравнивание по ширине ванильного hunger bar)
+        // Ванильный hunger bar располагается от (screenWidth / 2 + 10) до (screenWidth / 2 + 91)
+        int startX = screenWidth / 2 + 10;
+        for (int i = 0; i < 10; i++) {
+            int iconX = startX + i * 8;
+            renderOrb(graphics, iconX, y, i < filledCount, progress);
+        }
+
+        // Серия убийств (Kill Streak), если активна
         int streak = KillStreakService.getClientStreak();
-        String streakText = null;
         if (streak > 0) {
-            streakText = "🔥 Streak: " + streak + " (+" + streak + "%)";
-            panelWidth = Math.max(panelWidth, mc.font.width(streakText) + PADDING * 2);
-            panelHeight += mc.font.lineHeight + 2;
+            String streakText = "🔥 " + streak + " (+" + streak + "%)";
+            int textX = (screenWidth / 2 + 90) - mc.font.width(streakText);
+            graphics.drawString(mc.font, streakText, textX, y - 10, 0xFFFF6600, true);
         }
+    }
 
-        // Прогресс до следующего уровня
-        float progressToNext = player.experienceProgress;
-        String progressText = "XP: " + (int)(progressToNext * 100) + "%";
-        panelWidth = Math.max(panelWidth, mc.font.width(progressText) + PADDING * 2);
-        panelHeight += mc.font.lineHeight + 2;
+    /**
+     * Отрисовка одной 8x8 сферы опыта через GuiGraphics.fill.
+     * Заполненная сфера окрашивается динамически в соответствии с тиром прогресса:
+     * - progress < 0.50f: зелёный
+     * - 0.50f <= progress < 1.00f: аквамариновый
+     * - progress >= 1.00f: золотой
+     */
+    private static void renderOrb(GuiGraphics graphics, int x, int y, boolean filled, float progress) {
+        if (!filled) {
+            // Тёмный контур пустой сферы (8x8)
+            graphics.fill(x + 2, y,     x + 6, y + 1, 0xFF141414);
+            graphics.fill(x + 2, y + 7, x + 6, y + 8, 0xFF141414);
+            graphics.fill(x + 1, y + 1, x + 2, y + 2, 0xFF141414);
+            graphics.fill(x + 6, y + 1, x + 7, y + 2, 0xFF141414);
+            graphics.fill(x + 1, y + 6, x + 2, y + 7, 0xFF141414);
+            graphics.fill(x + 6, y + 6, x + 7, y + 7, 0xFF141414);
+            graphics.fill(x,     y + 2, x + 1, y + 6, 0xFF141414);
+            graphics.fill(x + 7, y + 2, x + 8, y + 6, 0xFF141414);
 
-        // Фон панели
-        graphics.fill(x, y, x + panelWidth, y + panelHeight, BG_COLOR);
+            // Полупрозрачное затемнённое тело
+            graphics.fill(x + 2, y + 1, x + 6, y + 2, 0x88242424);
+            graphics.fill(x + 1, y + 2, x + 7, y + 6, 0x88242424);
+            graphics.fill(x + 2, y + 6, x + 6, y + 7, 0x88242424);
 
-        int textY = y + PADDING;
+            // Тусклая центральная точка глубины
+            graphics.fill(x + 3, y + 3, x + 5, y + 5, 0x88383838);
+        } else {
+            int outline, main, highlight, shadow;
+            if (progress >= 1.00f) {
+                outline   = 0xFF382500; // Тёмно-янтарный контур
+                main      = 0xFFFFD700; // Золотой
+                highlight = 0xFFFFF59D; // Светло-золотой блик
+                shadow    = 0xFFB8860B; // Тёмное золото
+            } else if (progress >= 0.50f) {
+                outline   = 0xFF0B2D30; // Тёмный циан
+                main      = 0xFF55E2E9; // Аквамарин
+                highlight = 0xFFD5FFFF; // Светлый блик
+                shadow    = 0xFF15767A; // Глубокий циан
+            } else {
+                outline   = 0xFF0A2B0A; // Тёмно-зелёный
+                main      = 0xFF4ADE4A; // Ярко-зелёный
+                highlight = 0xFFC8FFA0; // Салатовый блик
+                shadow    = 0xFF158015; // Тёмно-зелёная тень
+            }
 
-        // Строка 1: Уровень
-        graphics.drawString(mc.font, levelText, x + PADDING, textY, TEXT_COLOR, true);
-        textY += mc.font.lineHeight + 2;
+            // Контур (8x8)
+            graphics.fill(x + 2, y,     x + 6, y + 1, outline);
+            graphics.fill(x + 2, y + 7, x + 6, y + 8, outline);
+            graphics.fill(x + 1, y + 1, x + 2, y + 2, outline);
+            graphics.fill(x + 6, y + 1, x + 7, y + 2, outline);
+            graphics.fill(x + 1, y + 6, x + 2, y + 7, outline);
+            graphics.fill(x + 6, y + 6, x + 7, y + 7, outline);
+            graphics.fill(x,     y + 2, x + 1, y + 6, outline);
+            graphics.fill(x + 7, y + 2, x + 8, y + 6, outline);
 
-        // Строка 2: Полоска прогресса до maxLevel
-        float ratio = Math.min((float) currentLevel / maxLevel, 1.0f);
-        int barX = x + PADDING;
-        int barY = textY;
-        int fillWidth = (int) (BAR_WIDTH * ratio);
-        int barColor = ratio >= 1.0f ? BAR_MAX_COLOR : BAR_FILL_COLOR;
+            // Заполненное тело
+            graphics.fill(x + 2, y + 1, x + 6, y + 2, main);
+            graphics.fill(x + 1, y + 2, x + 7, y + 5, main);
+            graphics.fill(x + 1, y + 5, x + 7, y + 6, shadow);
+            graphics.fill(x + 2, y + 6, x + 6, y + 7, shadow);
 
-        graphics.fill(barX, barY, barX + BAR_WIDTH, barY + BAR_HEIGHT, BAR_BG_COLOR);
-        if (fillWidth > 0) {
-            graphics.fill(barX, barY, barX + fillWidth, barY + BAR_HEIGHT, barColor);
-        }
-        textY += BAR_HEIGHT + 2;
-
-        // Строка 3: XP до следующего уровня
-        graphics.drawString(mc.font, progressText, x + PADDING, textY, 0xFFAAFFAA, true);
-        textY += mc.font.lineHeight + 2;
-
-        // Строка 4: Kill Streak (если есть)
-        if (streakText != null) {
-            graphics.drawString(mc.font, streakText, x + PADDING, textY, STREAK_COLOR, true);
+            // Спекулярный блик (вверху слева)
+            graphics.fill(x + 2, y + 2, x + 4, y + 4, highlight);
         }
     }
 }

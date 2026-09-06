@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Миксин в Player для:
  * 1. Перехвата дропа инвентаря при наличии Пузырька Жизни.
- * 2. Идеально точного расчёта выпадающего опыта при смерти (Death XP Tax) без дюпа и без ванильного капа в 100 XP.
+ * 2. Идеально точного расчёта выпадающего опыта при смерти (Death XP Tax) с защитой от Integer Overflow.
  */
 @Mixin(Player.class)
 public abstract class MixinPlayer {
@@ -38,10 +38,10 @@ public abstract class MixinPlayer {
             if (player instanceof ServerPlayer serverPlayer) {
                 tax = com.hs1n.lifeXp_challenge.service.DeathTaxService.calculateSmartTax(serverPlayer);
             }
-            // Точный расчёт всего опыта из уровней и текущего прогресса
-            int totalXp = ExperienceUtils.getPlayerTotalXp(player);
-            int xpToDrop = (int) Math.round(totalXp * tax);
-            cir.setReturnValue(Math.max(0, xpToDrop));
+            // Точный расчёт всего опыта в long с защитой от переполнения
+            long totalXp = ExperienceUtils.getPlayerTotalXp(player);
+            long xpToDrop = Math.round(totalXp * tax);
+            cir.setReturnValue((int) Math.min((long) Integer.MAX_VALUE, Math.max(0L, xpToDrop)));
         } else {
             cir.setReturnValue(0);
         }

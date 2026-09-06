@@ -167,32 +167,6 @@ public class LifeXpConfigScreen {
                                 .controller(opt -> DoubleFieldControllerBuilder.create(opt))
                                 .build())
                         .build())
-
-                // ── XP Shield (Механики) ──
-                .group(OptionGroup.createBuilder()
-                        .name(Component.translatable("lifexp.config.general.xp_shield"))
-                        .description(OptionDescription.of(Component.translatable("lifexp.config.general.xp_shield.desc")))
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.xp_shield.enable"))
-                                .binding(defaults.isEnableXpShield(), config::isEnableXpShield, config::setEnableXpShield)
-                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.xp_shield.absorb"))
-                                .binding(defaults.getXpShieldAbsorptionPercent(), config::getXpShieldAbsorptionPercent, config::setXpShieldAbsorptionPercent)
-                                .controller(opt -> DoubleSliderControllerBuilder.create(opt).range(0.0, 1.0).step(0.05))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.xp_shield.block_chance"))
-                                .binding(defaults.getXpShieldPerfectBlockChance(), config::getXpShieldPerfectBlockChance, config::setXpShieldPerfectBlockChance)
-                                .controller(opt -> DoubleSliderControllerBuilder.create(opt).range(0.0, 1.0).step(0.01))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.xp_shield.block_cost"))
-                                .binding(defaults.getXpShieldPerfectBlockCost(), config::getXpShieldPerfectBlockCost, config::setXpShieldPerfectBlockCost)
-                                .controller(opt -> DoubleSliderControllerBuilder.create(opt).range(0.0, 1.0).step(0.01))
-                                .build())
-                        .build())
                 .build());
 
         // ════════════════════════════════════════════════════════

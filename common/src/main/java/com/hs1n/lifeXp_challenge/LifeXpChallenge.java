@@ -23,6 +23,8 @@ public class LifeXpChallenge {
         LifeXpConfig.load();
         
         ModItems.ITEMS.register();
+        com.hs1n.lifeXp_challenge.registry.ModMobEffects.MOB_EFFECTS.register();
+        com.hs1n.lifeXp_challenge.registry.ModPotions.POTIONS.register();
         ModCreativeTabs.CREATIVE_MODE_TABS.register();
 
         CommandRegistrationEvent.EVENT.register((dispatcher, registryAccess, selection) -> {
@@ -54,6 +56,6 @@ public class LifeXpChallenge {
             return dev.architectury.event.EventResult.pass();
         });
 
-        dev.architectury.registry.CreativeTabRegistry.append(ModCreativeTabs.LIFE_XP_TAB, ModItems.DYNAMIC_XP_BOTTLE, ModItems.LIFE_BOTTLE);
+        dev.architectury.registry.CreativeTabRegistry.append(ModCreativeTabs.LIFE_XP_TAB, ModItems.DYNAMIC_XP_BOTTLE, ModItems.LIFE_BOTTLE, ModItems.SHIELD_CORE);
     }
 }

@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Клиентский миксин для динамического тумана.
  * После установки ванильного тумана перезаписывает fogStart и fogEnd
  * значениями, интерполированными по уровню опыта игрока.
- * При малой дистанции (<15 блоков) делает цвет тумана чёрным.
+ * Защищает от пропадания чанков (culling fix: дистанция строго >= 16.0F).
+ * Поддерживает disableFog для совместимости с шейдерами.
  */
 @Mixin(FogRenderer.class)
 public abstract class MixinFogRenderer {
@@ -26,7 +27,7 @@ public abstract class MixinFogRenderer {
                                             float viewDistance, boolean thickFog,
                                             float partialTick, CallbackInfo ci) {
         LifeXpConfig config = LifeXpConfig.INSTANCE;
-        if (!config.isEnableCustomFog()) return;
+        if (config.isDisableFog() || !config.isEnableCustomFog()) return;
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -42,16 +43,18 @@ public abstract class MixinFogRenderer {
                 level, maxLevel
         );
 
-        // Не даём дистанции быть меньше 1 блока
-        if (fogDist < 1.0) fogDist = 1.0;
-
-        float fogEnd   = (float) fogDist;
-        float fogStart = fogEnd * 0.1f; // начало тумана — 10% от дистанции
+        // Блокируем падение тумана ниже 16.0F блоков для setShaderFogStart и setShaderFogEnd (фикс куллинга чанков)
+        float rawEnd = (float) fogDist;
+        float fogEnd = Math.max(16.0f, rawEnd);
+        float fogStart = Math.max(16.0f, fogEnd * 0.1f);
+        if (fogStart > fogEnd) {
+            fogStart = fogEnd;
+        }
 
         RenderSystem.setShaderFogStart(fogStart);
         RenderSystem.setShaderFogEnd(fogEnd);
 
-        // При дистанции < 15 блоков — чёрный туман вместо «молока»
+        // При исходной дистанции < 15 блоков — чёрный туман вместо «молока»
         if (fogDist < 15.0) {
             RenderSystem.setShaderFogColor(0.0f, 0.0f, 0.0f, 1.0f);
         }

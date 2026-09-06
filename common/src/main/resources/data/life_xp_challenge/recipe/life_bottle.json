@@ -9,7 +9,7 @@
   "key": {
     "T": { "item": "minecraft:totem_of_undying" },
     "E": { "item": "minecraft:ender_eye" },
-    "C": { "item": "minecraft:bundle" },
+    "C": { "item": "minecraft:chest" },
     "B": { "item": "minecraft:glass_bottle" }
   },
   "result": {

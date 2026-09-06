@@ -2,6 +2,7 @@ package com.hs1n.lifeXp_challenge.item;
 
 import com.hs1n.lifeXp_challenge.util.MessageUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -215,11 +216,14 @@ public class LifeBottleItem extends Item {
             int itemCount = listTag != null ? listTag.size() : 0;
             tooltip.add(Component.translatable("lifexp.life_bottle.contains_items", itemCount)
                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-            tooltip.add(Component.translatable("lifexp.life_bottle.shift_unpack")
+        }
+
+        if (Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("item.life_xp_challenge.life_bottle.desc")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
-            tooltip.add(Component.translatable("lifexp.life_bottle.empty_desc")
-                    .withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("lifexp.tooltip.hold_shift")
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
 
         // Цветокоррекция (светофор) для одной кастомной строки прочности

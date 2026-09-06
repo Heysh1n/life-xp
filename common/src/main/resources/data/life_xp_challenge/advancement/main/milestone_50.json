@@ -1,0 +1,26 @@
+{
+  "parent": "life_xp_challenge:main/milestone_10",
+  "display": {
+    "icon": {
+      "id": "minecraft:diamond_block"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.milestone_50.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.milestone_50.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reached": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "function": "life_xp_challenge:rewards/level_250"
+  }
+}
