@@ -257,14 +257,14 @@ public final class LifeXpCommand {
         return saveAndNotify(ctx, attrName + "." + field, String.format("%.4f", value));
     }
 
-    private static final String PRESET_TAG = "lifexp_preset_chosen";
+    public static final String PRESET_TAG = "lifexp_preset_chosen";
 
     private static int executePreset(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack source = ctx.getSource();
         ServerPlayer player = source.getPlayer();
 
         // Проверяем перманентную блокировку выбора пресета (Origins-style)
-        if (player != null && player.getTags().contains(PRESET_TAG)) {
+        if (LifeXpConfig.INSTANCE.isLockPresetAfterSelection() && player != null && player.getTags().contains(PRESET_TAG)) {
             source.sendFailure(prefix().append(Component.translatable("lifexp.error.preset_locked")
                     .withStyle(ChatFormatting.RED)));
             return 0;

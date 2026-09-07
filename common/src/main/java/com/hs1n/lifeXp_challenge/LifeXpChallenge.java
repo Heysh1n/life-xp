@@ -23,9 +23,11 @@ public class LifeXpChallenge {
         LifeXpConfig.load();
         
         ModItems.ITEMS.register();
-        com.hs1n.lifeXp_challenge.registry.ModMobEffects.MOB_EFFECTS.register();
-        com.hs1n.lifeXp_challenge.registry.ModPotions.POTIONS.register();
+        com.hs1n.lifeXp_challenge.registry.ModMobEffects.init();
+        com.hs1n.lifeXp_challenge.registry.ModPotions.init();
         ModCreativeTabs.CREATIVE_MODE_TABS.register();
+
+        com.hs1n.lifeXp_challenge.network.LifeXpNetworking.registerServerReceiver();
 
         CommandRegistrationEvent.EVENT.register((dispatcher, registryAccess, selection) -> {
             LifeXpCommand.register(dispatcher);
@@ -33,6 +35,9 @@ public class LifeXpChallenge {
 
         PlayerEvent.PLAYER_JOIN.register(player -> {
             AttributeService.recalculate(player);
+            if (!player.getTags().contains(LifeXpCommand.PRESET_TAG)) {
+                com.hs1n.lifeXp_challenge.network.LifeXpNetworking.sendOpenPresetScreen(player);
+            }
         });
 
         PlayerEvent.PLAYER_RESPAWN.register((net.minecraft.server.level.ServerPlayer player, boolean conqueredEnd, net.minecraft.world.entity.Entity.RemovalReason removalReason) -> {

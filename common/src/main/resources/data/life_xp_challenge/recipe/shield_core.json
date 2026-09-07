@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "EAY",
+    "YAY",
     "ADA",
-    "RAR"
+    "ERE"
   ],
   "key": {
     "D": { "item": "life_xp_challenge:dynamic_xp_bottle" },

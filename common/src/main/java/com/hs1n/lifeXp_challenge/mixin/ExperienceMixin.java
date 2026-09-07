@@ -22,15 +22,6 @@ public abstract class ExperienceMixin {
     @Unique
     private int lifeXp$preLevel;
 
-    @ModifyVariable(method = "giveExperiencePoints", at = @At("HEAD"), argsOnly = true)
-    private int lifeXp$modifyExperiencePoints(int amount) {
-        Player player = (Player) (Object) this;
-        if (player instanceof ServerPlayer serverPlayer && amount > 0) {
-            return KillStreakService.modifyExperience(serverPlayer, amount);
-        }
-        return amount;
-    }
-
     @Inject(method = "giveExperienceLevels", at = @At("TAIL"))
     private void lifeXp$onGiveExperienceLevels(int levels, CallbackInfo ci) {
         AttributeService.recalculate((Player) (Object) this);

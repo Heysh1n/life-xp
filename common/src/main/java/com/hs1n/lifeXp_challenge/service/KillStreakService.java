@@ -14,6 +14,7 @@ public class KillStreakService {
     private static final int MAX_STREAK = 100; // Максимум +100% опыта (х2)
 
     public static void onMobKilled(ServerPlayer player) {
+        if (!com.hs1n.lifeXp_challenge.config.LifeXpConfig.INSTANCE.isEnableKillStreak()) return;
         UUID uuid = player.getUUID();
         int streak = KILL_STREAKS.getOrDefault(uuid, 0) + 1;
         streak = Math.min(streak, MAX_STREAK);
@@ -35,6 +36,7 @@ public class KillStreakService {
     }
 
     public static int modifyExperience(ServerPlayer player, int amount) {
+        if (!com.hs1n.lifeXp_challenge.config.LifeXpConfig.INSTANCE.isEnableKillStreak()) return amount;
         int streak = KILL_STREAKS.getOrDefault(player.getUUID(), 0);
         if (streak > 0) {
             double multiplier = 1.0 + (streak * STREAK_BONUS_PER_KILL);

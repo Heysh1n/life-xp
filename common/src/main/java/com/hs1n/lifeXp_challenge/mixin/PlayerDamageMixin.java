@@ -19,4 +19,12 @@ public abstract class PlayerDamageMixin {
         }
         return amount;
     }
+
+    @org.spongepowered.asm.mixin.injection.Inject(method = "actuallyHurt", at = @At("TAIL"))
+    private void lifeXp$checkLifeOrDeath(DamageSource damageSource, float amount, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        Player player = (Player) (Object) this;
+        if (player instanceof ServerPlayer serverPlayer) {
+            com.hs1n.lifeXp_challenge.service.AdvancementService.checkLifeOrDeath(serverPlayer);
+        }
+    }
 }

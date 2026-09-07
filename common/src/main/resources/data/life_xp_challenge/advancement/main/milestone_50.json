@@ -19,8 +19,5 @@
     "reached": {
       "trigger": "minecraft:impossible"
     }
-  },
-  "rewards": {
-    "function": "life_xp_challenge:rewards/level_250"
   }
 }
