@@ -96,6 +96,22 @@ public class LifeXpConfigScreen {
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyRealHardcore))
                                 .build())
 
+                        // ── Пресет 5: Core (No Streaks) ──
+                        .option(ButtonOption.createBuilder()
+                                .name(Component.translatable("lifexp.config.preset.core_no_streaks"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.preset.core_no_streaks.desc")))
+                                .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyCoreNoStreaks))
+                                .build())
+
+                        // ── Пресет 6: Purist ──
+                        .option(ButtonOption.createBuilder()
+                                .name(Component.translatable("lifexp.config.preset.purist"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.preset.purist.desc")))
+                                .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyPurist))
+                                .build())
+
                         .build())
                 .build());
 
@@ -131,13 +147,34 @@ public class LifeXpConfigScreen {
                                 .binding(defaults.isShowDeathCoordinates(), config::isShowDeathCoordinates, config::setShowDeathCoordinates)
                                 .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("lifexp.config.general.lock_preset"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.general.lock_preset.desc")))
+                                .binding(defaults.isLockPresetAfterSelection(), config::isLockPresetAfterSelection, config::setLockPresetAfterSelection)
+                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("lifexp.config.general.kill_streak"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.general.kill_streak.desc")))
+                                .binding(defaults.isEnableKillStreak(), config::isEnableKillStreak, config::setEnableKillStreak)
+                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
+                                .build())
                         .build())
 
-                // ── Туман (Visuals) ──
+                // ── Туман & Интерфейс (Visuals) ──
                 .group(OptionGroup.createBuilder()
                         .name(Component.translatable("lifexp.config.general.fog"))
                         .description(OptionDescription.of(
                                 Component.translatable("lifexp.config.general.fog.desc")))
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("lifexp.config.general.fog.disable"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.general.fog.disable.desc")))
+                                .binding(defaults.isDisableFog(), config::isDisableFog, config::setDisableFog)
+                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
+                                .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.translatable("lifexp.config.general.fog.enable"))
                                 .description(OptionDescription.of(
@@ -165,6 +202,13 @@ public class LifeXpConfigScreen {
                                         Component.translatable("lifexp.config.general.fog.end.desc")))
                                 .binding(defaults.getFogEndDistance(), config::getFogEndDistance, config::setFogEndDistance)
                                 .controller(opt -> DoubleFieldControllerBuilder.create(opt))
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("lifexp.config.general.show_hud_bubbles"))
+                                .description(OptionDescription.of(
+                                        Component.translatable("lifexp.config.general.show_hud_bubbles.desc")))
+                                .binding(defaults.isShowHudBubbles(), config::isShowHudBubbles, config::setShowHudBubbles)
+                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
                                 .build())
                         .build())
                 .build());

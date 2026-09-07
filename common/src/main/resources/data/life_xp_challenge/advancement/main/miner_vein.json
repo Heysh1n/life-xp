@@ -2,13 +2,13 @@
   "parent": "life_xp_challenge:main/root",
   "display": {
     "icon": {
-      "id": "minecraft:experience_bottle"
+      "id": "minecraft:diamond_pickaxe"
     },
     "title": {
-      "translate": "advancement.life_xp_challenge.level_100.title"
+      "translate": "advancement.life_xp_challenge.miner_vein.title"
     },
     "description": {
-      "translate": "advancement.life_xp_challenge.level_100.desc"
+      "translate": "advancement.life_xp_challenge.miner_vein.desc"
     },
     "frame": "goal",
     "show_toast": true,
@@ -16,11 +16,8 @@
     "hidden": false
   },
   "criteria": {
-    "reached": {
+    "mined_xp": {
       "trigger": "minecraft:impossible"
     }
-  },
-  "rewards": {
-    "function": "life_xp_challenge:rewards/level_100"
   }
 }

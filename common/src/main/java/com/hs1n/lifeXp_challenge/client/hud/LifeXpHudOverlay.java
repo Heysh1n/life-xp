@@ -28,6 +28,10 @@ public class LifeXpHudOverlay {
         }
 
         LifeXpConfig config = LifeXpConfig.INSTANCE;
+        if (!config.isShowHudBubbles()) {
+            return;
+        }
+
         int maxLevel = config.getMaxLevel();
         if (maxLevel <= 0) {
             maxLevel = 1;

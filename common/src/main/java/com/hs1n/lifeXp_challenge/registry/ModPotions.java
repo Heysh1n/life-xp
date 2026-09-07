@@ -21,4 +21,8 @@ public final class ModPotions {
     // Сильное зелье XP-Щита (1:30, Уровень II)
     public static final RegistrySupplier<Potion> STRONG_XP_SHIELD = POTIONS.register("strong_xp_shield",
             () -> new Potion("xp_shield", new MobEffectInstance(ModMobEffects.XP_SHIELD, 1800, 1)));
+
+    // Ультра зелье XP-Щита (1:00, Уровень III / 75% поглощения)
+    public static final RegistrySupplier<Potion> ULTRA_XP_SHIELD = POTIONS.register("ultra_xp_shield",
+            () -> new Potion("ultra_xp_shield", new MobEffectInstance(ModMobEffects.XP_SHIELD, 1200, 2)));
 }

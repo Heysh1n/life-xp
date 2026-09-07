@@ -21,5 +21,7 @@ public abstract class PotionBrewingMixin {
         builder.addMix(ModPotions.XP_SHIELD, Items.REDSTONE, ModPotions.LONG_XP_SHIELD);
         // XP-Щит + Glowstone = Сильное зелье XP-Щита II (1:30)
         builder.addMix(ModPotions.XP_SHIELD, Items.GLOWSTONE_DUST, ModPotions.STRONG_XP_SHIELD);
+        // Сильное зелье XP-Щита II + Звезда Незера = Ультра зелье XP-Щита III (1:00)
+        builder.addMix(ModPotions.STRONG_XP_SHIELD, Items.NETHER_STAR, ModPotions.ULTRA_XP_SHIELD);
     }
 }

@@ -15,7 +15,9 @@ public class LifeXpChallengeNeoForge {
     public LifeXpChallengeNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         LifeXpChallenge.init();
         
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraft, parent) -> LifeXpConfigScreen.create(parent));
+        if (net.neoforged.fml.loading.FMLEnvironment.dist == Dist.CLIENT) {
+            modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraft, parent) -> LifeXpConfigScreen.create(parent));
+        }
         
         modEventBus.addListener(this::onClientSetup);
     }

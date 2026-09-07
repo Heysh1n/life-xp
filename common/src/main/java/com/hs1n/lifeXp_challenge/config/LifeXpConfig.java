@@ -25,6 +25,9 @@ public class LifeXpConfig {
     private double fogStartDistance = 15.0;
     private double fogMidDistance = 64.0;
     private double fogEndDistance = 128.0;
+    private boolean enableKillStreak = true;
+    private boolean showHudBubbles = true;
+    private boolean lockPresetAfterSelection = true;
 
     private final Map<String, AttributeConfigNode> nodes = new LinkedHashMap<>();
 
@@ -74,6 +77,15 @@ public class LifeXpConfig {
     public double getFogEndDistance() { return fogEndDistance; }
     public void setFogEndDistance(double fogEndDistance) { this.fogEndDistance = fogEndDistance; }
 
+    public boolean isEnableKillStreak() { return enableKillStreak; }
+    public void setEnableKillStreak(boolean enableKillStreak) { this.enableKillStreak = enableKillStreak; }
+
+    public boolean isShowHudBubbles() { return showHudBubbles; }
+    public void setShowHudBubbles(boolean showHudBubbles) { this.showHudBubbles = showHudBubbles; }
+
+    public boolean isLockPresetAfterSelection() { return lockPresetAfterSelection; }
+    public void setLockPresetAfterSelection(boolean lockPresetAfterSelection) { this.lockPresetAfterSelection = lockPresetAfterSelection; }
+
     public AttributeConfigNode getNode(String key) { return nodes.get(key); }
     public Map<String, AttributeConfigNode> getNodes() { return nodes; }
 
@@ -92,6 +104,9 @@ public class LifeXpConfig {
                     if (root.has("fogStartDistance")) config.setFogStartDistance(root.get("fogStartDistance").getAsDouble());
                     if (root.has("fogMidDistance")) config.setFogMidDistance(root.get("fogMidDistance").getAsDouble());
                     if (root.has("fogEndDistance")) config.setFogEndDistance(root.get("fogEndDistance").getAsDouble());
+                    if (root.has("enableKillStreak")) config.setEnableKillStreak(root.get("enableKillStreak").getAsBoolean());
+                    if (root.has("showHudBubbles")) config.setShowHudBubbles(root.get("showHudBubbles").getAsBoolean());
+                    if (root.has("lockPresetAfterSelection")) config.setLockPresetAfterSelection(root.get("lockPresetAfterSelection").getAsBoolean());
                     if (root.has("attributes")) {
                         JsonObject attrs = root.getAsJsonObject("attributes");
                         for (Map.Entry<String, AttributeConfigNode> entry : config.nodes.entrySet()) {
@@ -124,6 +139,9 @@ public class LifeXpConfig {
         root.addProperty("fogStartDistance", INSTANCE.fogStartDistance);
         root.addProperty("fogMidDistance", INSTANCE.fogMidDistance);
         root.addProperty("fogEndDistance", INSTANCE.fogEndDistance);
+        root.addProperty("enableKillStreak", INSTANCE.enableKillStreak);
+        root.addProperty("showHudBubbles", INSTANCE.showHudBubbles);
+        root.addProperty("lockPresetAfterSelection", INSTANCE.lockPresetAfterSelection);
 
         JsonObject attrs = new JsonObject();
         for (Map.Entry<String, AttributeConfigNode> entry : INSTANCE.nodes.entrySet()) {

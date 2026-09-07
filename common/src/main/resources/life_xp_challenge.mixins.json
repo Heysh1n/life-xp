@@ -4,7 +4,10 @@
   "package": "com.hs1n.lifeXp_challenge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BlockExperienceMixin",
     "ExperienceMixin",
+    "ExperienceOrbMixin",
+    "FishingHookMixin",
     "MixinAnvilMenu",
     "MixinBottleItem",
     "MixinItem",

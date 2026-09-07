@@ -7,7 +7,7 @@ package com.hs1n.lifeXp_challenge.config;
 public final class LifeXpPresets {
 
     /** Имена пресетов для автодополнения команд. */
-    public static final String[] PRESET_NAMES = {"core", "vanilla_plus", "baby_mode", "real_hardcore"};
+    public static final String[] PRESET_NAMES = {"core", "vanilla_plus", "baby_mode", "real_hardcore", "core_no_streaks", "purist"};
 
     private LifeXpPresets() {}
 
@@ -17,10 +17,12 @@ public final class LifeXpPresets {
      */
     public static boolean apply(String name) {
         return switch (name) {
-            case "core"           -> { applyCore();          yield true; }
-            case "vanilla_plus"   -> { applyVanillaPlus();   yield true; }
-            case "baby_mode"      -> { applyBabyMode();      yield true; }
-            case "real_hardcore"  -> { applyRealHardcore();   yield true; }
+            case "core"            -> { applyCore();           yield true; }
+            case "vanilla_plus"    -> { applyVanillaPlus();    yield true; }
+            case "baby_mode"       -> { applyBabyMode();       yield true; }
+            case "real_hardcore"   -> { applyRealHardcore();    yield true; }
+            case "core_no_streaks" -> { applyCoreNoStreaks();  yield true; }
+            case "purist"          -> { applyPurist();         yield true; }
             default -> false;
         };
     }
@@ -157,5 +159,26 @@ public final class LifeXpPresets {
         set(cfg, "safe_fall_distance",      -1.0,    0.0,    1.0);
         set(cfg, "oxygen_bonus",            -1.0,   -0.5,    0.0);
         set(cfg, "burning_time",             2.0,    1.0,    0.0);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 5: Core (No Streaks) — без множителя серии убийств
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyCoreNoStreaks() {
+        applyCore();
+        LifeXpConfig.INSTANCE.setEnableKillStreak(false);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 6: Purist (Classic) — чистый ванильный хардкор
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyPurist() {
+        applyCore();
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setEnableKillStreak(false);
+        cfg.setDeathXpTax(1.0);
+        cfg.setEnableCustomFog(false);
     }
 }

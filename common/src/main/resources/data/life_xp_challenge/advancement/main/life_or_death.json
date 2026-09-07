@@ -2,21 +2,21 @@
   "parent": "life_xp_challenge:main/root",
   "display": {
     "icon": {
-      "id": "minecraft:experience_bottle"
+      "id": "minecraft:totem_of_undying"
     },
     "title": {
-      "translate": "advancement.life_xp_challenge.milestone_10.title"
+      "translate": "advancement.life_xp_challenge.life_or_death.title"
     },
     "description": {
-      "translate": "advancement.life_xp_challenge.milestone_10.desc"
+      "translate": "advancement.life_xp_challenge.life_or_death.desc"
     },
-    "frame": "goal",
+    "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "reached": {
+    "survived": {
       "trigger": "minecraft:impossible"
     }
   }
