@@ -46,10 +46,6 @@ public final class LifeXpPresets {
         cfg.setMaxLevel(1000);
         cfg.setDeathXpTax(0.5);
 
-        cfg.setEnableCustomFog(true);
-        cfg.setFogStartDistance(4.0);
-        cfg.setFogMidDistance(40.0);
-        cfg.setFogEndDistance(200.0);
 
         set(cfg, "max_health",              -19.0,  -8.0,   12.0);
         set(cfg, "movement_speed",          -0.02,   0.0,    0.02);
@@ -77,11 +73,6 @@ public final class LifeXpPresets {
         cfg.setMaxLevel(500);
         cfg.setDeathXpTax(0.5);
 
-        cfg.setEnableCustomFog(false);
-        cfg.setFogStartDistance(5.0);
-        cfg.setFogMidDistance(60.0);
-        cfg.setFogEndDistance(200.0);
-
         set(cfg, "max_health",              -14.0,  -6.0,    4.0);
         set(cfg, "movement_speed",           0.0,    0.005,  0.015);
         set(cfg, "attack_damage",            0.0,    1.0,    2.5);
@@ -108,11 +99,6 @@ public final class LifeXpPresets {
         cfg.setMaxLevel(200);
         cfg.setDeathXpTax(0.8);
 
-        cfg.setEnableCustomFog(false);
-        cfg.setFogStartDistance(5.0);
-        cfg.setFogMidDistance(60.0);
-        cfg.setFogEndDistance(200.0);
-
         set(cfg, "max_health",               0.0,   20.0,   40.0);
         set(cfg, "movement_speed",           0.0,    0.05,   0.1);
         set(cfg, "attack_damage",            2.0,    5.0,   10.0);
@@ -138,11 +124,6 @@ public final class LifeXpPresets {
         LifeXpConfig cfg = LifeXpConfig.INSTANCE;
         cfg.setMaxLevel(10000);
         cfg.setDeathXpTax(0.2);
-
-        cfg.setEnableCustomFog(true);
-        cfg.setFogStartDistance(3.0);
-        cfg.setFogMidDistance(20.0);
-        cfg.setFogEndDistance(150.0);
 
         set(cfg, "max_health",              -19.0,  -10.0,   0.0);
         set(cfg, "movement_speed",          -0.03,  -0.01,   0.0);
@@ -179,6 +160,5 @@ public final class LifeXpPresets {
         LifeXpConfig cfg = LifeXpConfig.INSTANCE;
         cfg.setEnableKillStreak(false);
         cfg.setDeathXpTax(1.0);
-        cfg.setEnableCustomFog(false);
     }
 }

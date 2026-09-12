@@ -163,46 +163,11 @@ public class LifeXpConfigScreen {
                                 .build())
                         .build())
 
-                // ── Туман & Интерфейс (Visuals) ──
+                // ── Визуальные эффекты (Visuals) ──
                 .group(OptionGroup.createBuilder()
-                        .name(Component.translatable("lifexp.config.general.fog"))
+                        .name(Component.translatable("lifexp.config.general.visuals"))
                         .description(OptionDescription.of(
-                                Component.translatable("lifexp.config.general.fog.desc")))
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.fog.disable"))
-                                .description(OptionDescription.of(
-                                        Component.translatable("lifexp.config.general.fog.disable.desc")))
-                                .binding(defaults.isDisableFog(), config::isDisableFog, config::setDisableFog)
-                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.fog.enable"))
-                                .description(OptionDescription.of(
-                                        Component.translatable("lifexp.config.general.fog.enable.desc")))
-                                .binding(defaults.isEnableCustomFog(), config::isEnableCustomFog, config::setEnableCustomFog)
-                                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.fog.start"))
-                                .description(OptionDescription.of(
-                                        Component.translatable("lifexp.config.general.fog.start.desc")))
-                                .binding(defaults.getFogStartDistance(), config::getFogStartDistance, config::setFogStartDistance)
-                                .controller(opt -> DoubleFieldControllerBuilder.create(opt))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.fog.mid"))
-                                .description(OptionDescription.of(
-                                        Component.translatable("lifexp.config.general.fog.mid.desc")))
-                                .binding(defaults.getFogMidDistance(), config::getFogMidDistance, config::setFogMidDistance)
-                                .controller(opt -> DoubleFieldControllerBuilder.create(opt))
-                                .build())
-                        .option(Option.<Double>createBuilder()
-                                .name(Component.translatable("lifexp.config.general.fog.end"))
-                                .description(OptionDescription.of(
-                                        Component.translatable("lifexp.config.general.fog.end.desc")))
-                                .binding(defaults.getFogEndDistance(), config::getFogEndDistance, config::setFogEndDistance)
-                                .controller(opt -> DoubleFieldControllerBuilder.create(opt))
-                                .build())
+                                Component.translatable("lifexp.config.general.visuals.desc")))
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.translatable("lifexp.config.general.show_hud_bubbles"))
                                 .description(OptionDescription.of(

@@ -15,6 +15,7 @@ public class LifeXpChallengeClient {
 
         // Регистрируем HUD-оверлей
         ClientGuiEvent.RENDER_HUD.register(LifeXpHudOverlay::render);
+        LifeXpVisualsClient.register();
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
             if (tintIndex != 0) return -1;
             

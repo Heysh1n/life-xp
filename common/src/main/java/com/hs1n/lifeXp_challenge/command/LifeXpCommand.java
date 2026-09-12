@@ -54,19 +54,6 @@ public final class LifeXpCommand {
                         .then(Commands.literal("deathCoords")
                                 .executes(ctx -> executeGetSimple(ctx, "deathCoords",
                                         String.valueOf(LifeXpConfig.INSTANCE.isShowDeathCoordinates()))))
-                        .then(Commands.literal("fog")
-                                .then(Commands.literal("enable")
-                                        .executes(ctx -> executeGetSimple(ctx, "fog.enable",
-                                                String.valueOf(LifeXpConfig.INSTANCE.isEnableCustomFog()))))
-                                .then(Commands.literal("start")
-                                        .executes(ctx -> executeGetSimple(ctx, "fog.start",
-                                                String.format("%.2f", LifeXpConfig.INSTANCE.getFogStartDistance()))))
-                                .then(Commands.literal("mid")
-                                        .executes(ctx -> executeGetSimple(ctx, "fog.mid",
-                                                String.format("%.2f", LifeXpConfig.INSTANCE.getFogMidDistance()))))
-                                .then(Commands.literal("end")
-                                        .executes(ctx -> executeGetSimple(ctx, "fog.end",
-                                                String.format("%.2f", LifeXpConfig.INSTANCE.getFogEndDistance())))))
                         .then(Commands.literal("attr")
                                 .then(Commands.argument("attribute", StringArgumentType.word())
                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(ATTR_KEYS, builder))
@@ -82,19 +69,6 @@ public final class LifeXpCommand {
                         .then(Commands.literal("deathCoords")
                                 .then(Commands.argument("value", BoolArgumentType.bool())
                                         .executes(LifeXpCommand::executeSetDeathCoords)))
-                        .then(Commands.literal("fog")
-                                .then(Commands.literal("enable")
-                                        .then(Commands.argument("value", BoolArgumentType.bool())
-                                                .executes(LifeXpCommand::executeSetFogEnable)))
-                                .then(Commands.literal("start")
-                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
-                                                .executes(ctx -> executeSetFogDistance(ctx, "start"))))
-                                .then(Commands.literal("mid")
-                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
-                                                .executes(ctx -> executeSetFogDistance(ctx, "mid"))))
-                                .then(Commands.literal("end")
-                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
-                                                .executes(ctx -> executeSetFogDistance(ctx, "end")))))
                         .then(Commands.literal("attr")
                                 .then(Commands.argument("attribute", StringArgumentType.word())
                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(ATTR_KEYS, builder))
@@ -144,11 +118,7 @@ public final class LifeXpCommand {
                         cfg.isShowDeathCoordinates() ? "ON" : "OFF")
                 .withStyle(ChatFormatting.YELLOW), false);
 
-        source.sendSuccess(() -> Component.translatable("lifexp.command.status.fog",
-                        cfg.isEnableCustomFog() ? "ON" : "OFF",
-                        cfg.getFogStartDistance(),
-                        cfg.getFogMidDistance(),
-                        cfg.getFogEndDistance())
+        source.sendSuccess(() -> Component.translatable("lifexp.command.status.visuals")
                 .withStyle(ChatFormatting.AQUA), false);
 
         source.sendSuccess(() -> Component.translatable("lifexp.command.status.attr_header")
@@ -219,22 +189,6 @@ public final class LifeXpCommand {
         return saveAndNotify(ctx, "deathCoords", String.valueOf(value));
     }
 
-    private static int executeSetFogEnable(CommandContext<CommandSourceStack> ctx) {
-        boolean value = BoolArgumentType.getBool(ctx, "value");
-        LifeXpConfig.INSTANCE.setEnableCustomFog(value);
-        return saveAndNotify(ctx, "fog.enable", String.valueOf(value));
-    }
-
-    private static int executeSetFogDistance(CommandContext<CommandSourceStack> ctx, String field) {
-        double value = DoubleArgumentType.getDouble(ctx, "value");
-        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
-        switch (field) {
-            case "start" -> cfg.setFogStartDistance(value);
-            case "mid"   -> cfg.setFogMidDistance(value);
-            case "end"   -> cfg.setFogEndDistance(value);
-        }
-        return saveAndNotify(ctx, "fog." + field, String.format("%.2f", value));
-    }
 
     private static int executeSetAttr(CommandContext<CommandSourceStack> ctx, String field) {
         String attrName = StringArgumentType.getString(ctx, "attribute");

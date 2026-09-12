@@ -20,11 +20,6 @@ public class LifeXpConfig {
     private int maxLevel = 1000;
     private boolean showDeathCoordinates = true;
     private double deathXpTax = 1.0;
-    private boolean enableCustomFog = false;
-    private boolean disableFog = false;
-    private double fogStartDistance = 15.0;
-    private double fogMidDistance = 64.0;
-    private double fogEndDistance = 128.0;
     private boolean enableKillStreak = true;
     private boolean showHudBubbles = true;
     private boolean lockPresetAfterSelection = true;
@@ -62,20 +57,6 @@ public class LifeXpConfig {
     public double getDeathXpTax() { return deathXpTax; }
     public void setDeathXpTax(double deathXpTax) { this.deathXpTax = Math.max(0.0, Math.min(1.0, deathXpTax)); }
 
-    public boolean isEnableCustomFog() { return enableCustomFog; }
-    public void setEnableCustomFog(boolean enableCustomFog) { this.enableCustomFog = enableCustomFog; }
-
-    public boolean isDisableFog() { return disableFog; }
-    public void setDisableFog(boolean disableFog) { this.disableFog = disableFog; }
-
-    public double getFogStartDistance() { return fogStartDistance; }
-    public void setFogStartDistance(double fogStartDistance) { this.fogStartDistance = fogStartDistance; }
-
-    public double getFogMidDistance() { return fogMidDistance; }
-    public void setFogMidDistance(double fogMidDistance) { this.fogMidDistance = fogMidDistance; }
-
-    public double getFogEndDistance() { return fogEndDistance; }
-    public void setFogEndDistance(double fogEndDistance) { this.fogEndDistance = fogEndDistance; }
 
     public boolean isEnableKillStreak() { return enableKillStreak; }
     public void setEnableKillStreak(boolean enableKillStreak) { this.enableKillStreak = enableKillStreak; }
@@ -99,11 +80,6 @@ public class LifeXpConfig {
                     if (root.has("maxLevel")) config.setMaxLevel(root.get("maxLevel").getAsInt());
                     if (root.has("showDeathCoordinates")) config.setShowDeathCoordinates(root.get("showDeathCoordinates").getAsBoolean());
                     if (root.has("deathXpTax")) config.setDeathXpTax(root.get("deathXpTax").getAsDouble());
-                    if (root.has("enableCustomFog")) config.setEnableCustomFog(root.get("enableCustomFog").getAsBoolean());
-                    if (root.has("disableFog")) config.setDisableFog(root.get("disableFog").getAsBoolean());
-                    if (root.has("fogStartDistance")) config.setFogStartDistance(root.get("fogStartDistance").getAsDouble());
-                    if (root.has("fogMidDistance")) config.setFogMidDistance(root.get("fogMidDistance").getAsDouble());
-                    if (root.has("fogEndDistance")) config.setFogEndDistance(root.get("fogEndDistance").getAsDouble());
                     if (root.has("enableKillStreak")) config.setEnableKillStreak(root.get("enableKillStreak").getAsBoolean());
                     if (root.has("showHudBubbles")) config.setShowHudBubbles(root.get("showHudBubbles").getAsBoolean());
                     if (root.has("lockPresetAfterSelection")) config.setLockPresetAfterSelection(root.get("lockPresetAfterSelection").getAsBoolean());
@@ -134,11 +110,6 @@ public class LifeXpConfig {
         root.addProperty("maxLevel", INSTANCE.maxLevel);
         root.addProperty("showDeathCoordinates", INSTANCE.showDeathCoordinates);
         root.addProperty("deathXpTax", INSTANCE.deathXpTax);
-        root.addProperty("enableCustomFog", INSTANCE.enableCustomFog);
-        root.addProperty("disableFog", INSTANCE.disableFog);
-        root.addProperty("fogStartDistance", INSTANCE.fogStartDistance);
-        root.addProperty("fogMidDistance", INSTANCE.fogMidDistance);
-        root.addProperty("fogEndDistance", INSTANCE.fogEndDistance);
         root.addProperty("enableKillStreak", INSTANCE.enableKillStreak);
         root.addProperty("showHudBubbles", INSTANCE.showHudBubbles);
         root.addProperty("lockPresetAfterSelection", INSTANCE.lockPresetAfterSelection);
