@@ -1,0 +1,9 @@
+v1	named	intermediary
+FIELD	com/hs1n/lifeXp_challenge/mixin/ExperienceOrbMixin	I	value	field_6159
+FIELD	com/hs1n/lifeXp_challenge/mixin/ExperienceOrbMixin	I	count	field_27009
+FIELD	com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin	I	lastHurtByPlayerTime	field_6238
+METHOD	com/hs1n/lifeXp_challenge/mixin/ExperienceOrbMixin	()I	getValue	method_5919
+METHOD	com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin	()Z	wasExperienceConsumed	method_41330
+METHOD	com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin	()Z	shouldDropExperience	method_6054
+METHOD	com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin	(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)I	getExperienceReward	method_59923
+METHOD	com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin	()Z	isAlwaysExperienceDropper	method_6071

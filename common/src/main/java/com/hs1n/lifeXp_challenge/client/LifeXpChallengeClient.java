@@ -20,19 +20,19 @@ public class LifeXpChallengeClient {
             if (tintIndex != 0) return -1;
             
             int stored = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().getInt("StoredXp");
-            if (stored <= 0) return 0xA0FF3C; // 160, 255, 60 (default color)
+            if (stored <= 0) return 0xFFA0FF3C; // 160, 255, 60 (default color, fully opaque)
             
-            float ratio = Math.min((float) stored / 3000f, 1f);
+            float ratio = Math.clamp((float) stored / 3000f, 0f, 1f);
             int r = (int) (160 - 150 * ratio); // 160 -> 10
             int g = (int) (255 - 175 * ratio); // 255 -> 80
             int b = (int) (60 - 40 * ratio);   // 60 -> 20
             
-            return (r << 16) | (g << 8) | b;
+            return 0xFF000000 | (r << 16) | (g << 8) | b;
         }, ModItems.DYNAMIC_XP_BOTTLE.get());
 
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
             if (tintIndex != 0) return -1;
-            return LifeBottleItem.hasSavedInventory(stack) ? 0xF59E0B : 0xDC2626;
+            return LifeBottleItem.hasSavedInventory(stack) ? 0xFFF59E0B : 0xFFDC2626;
         }, ModItems.LIFE_BOTTLE.get());
     }
 }

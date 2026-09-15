@@ -1,0 +1,9 @@
+/xp set Player253 100 levels
+/tick rate 500
+/tick rate 20
+/gamerule randomTickSpeed 100
+/gamerule randomTickSpeed 10000
+/gamerule randomTickSpeed 100
+/gamerule randomTickSpeed 10
+/tick rate 20
+/gamerule randomTickSpeed 1000

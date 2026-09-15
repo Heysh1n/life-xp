@@ -42,14 +42,14 @@ public final class LifeXpVisualsClient {
         if (mc.player == null || mc.options.hideGui) return;
 
         LocalPlayer player = mc.player;
-        if (player.isSpectator() || player.isCreative()) return;
+        if (player.isDeadOrDying() || player.isSpectator() || player.isCreative()) return;
 
         LifeXpConfig config = LifeXpConfig.INSTANCE;
         int maxLevel = Math.max(1, config.getMaxLevel());
         float currentXp = player.experienceLevel;
 
         // alpha = 1.0 при 0 XP, 0.0 при ≥ 50% maxLevel
-        float alpha = Math.max(0.0F, 1.0F - (currentXp / (maxLevel * 0.5F)));
+        float alpha = Math.clamp(1.0F - (currentXp / (maxLevel * 0.5F)), 0.0F, 1.0F);
         if (alpha <= 0.001F) return; // Полностью прозрачна — пропускаем рендер
 
         int screenWidth  = guiGraphics.guiWidth();
@@ -71,7 +71,7 @@ public final class LifeXpVisualsClient {
         if (mc.player == null || mc.level == null) return;
 
         LocalPlayer player = mc.player;
-        if (!player.isLocalPlayer() || player.isSpectator() || player.isCreative()) return;
+        if (!player.isLocalPlayer() || player.isDeadOrDying() || player.isSpectator() || player.isCreative()) return;
 
         LifeXpConfig config = LifeXpConfig.INSTANCE;
         int maxLevel = Math.max(1, config.getMaxLevel());

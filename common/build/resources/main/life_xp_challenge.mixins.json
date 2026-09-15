@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.hs1n.lifeXp_challenge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BlockExperienceMixin",
+    "ExperienceMixin",
+    "ExperienceOrbAccessor",
+    "ExperienceOrbMixin",
+    "FishingHookMixin",
+    "LivingEntityMixin",
+    "MixinAnvilMenu",
+    "MixinBottleItem",
+    "MixinItem",
+    "MixinPlayer",
+    "MixinServerPlayer",
+    "PlayerDamageMixin",
+    "PotionBrewingMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

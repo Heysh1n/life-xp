@@ -1,0 +1,27 @@
+{
+  "life_xp_challenge:main/root": {
+    "criteria": {
+      "init": "2026-09-13 13:10:00 +0300"
+    },
+    "done": true
+  },
+  "minecraft:recipes/decorations/crafting_table": {
+    "criteria": {
+      "unlock_right_away": "2026-09-13 13:10:00 +0300"
+    },
+    "done": true
+  },
+  "life_xp_challenge:main/milestone_10": {
+    "criteria": {
+      "reached": "2026-09-13 13:10:00 +0300"
+    },
+    "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:savanna": "2026-09-13 13:10:00 +0300"
+    },
+    "done": false
+  },
+  "DataVersion": 3955
+}

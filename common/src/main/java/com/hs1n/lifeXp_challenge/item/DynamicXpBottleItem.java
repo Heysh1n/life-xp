@@ -37,6 +37,9 @@ public class DynamicXpBottleItem extends Item {
     }
 
     public static int getStoredXp(ItemStack stack) {
+        if (stack.has(com.hs1n.lifeXp_challenge.registry.ModDataComponents.STORED_XP.get())) {
+            return stack.getOrDefault(com.hs1n.lifeXp_challenge.registry.ModDataComponents.STORED_XP.get(), 0);
+        }
         CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
         if (customData == null) return 0;
         CompoundTag tag = customData.copyTag();
@@ -44,9 +47,7 @@ public class DynamicXpBottleItem extends Item {
     }
 
     public static void setStoredXp(ItemStack stack, int points) {
-        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> {
-            tag.putInt(NBT_STORED_XP, Math.max(0, points));
-        });
+        stack.set(com.hs1n.lifeXp_challenge.registry.ModDataComponents.STORED_XP.get(), Math.max(0, points));
     }
 
     public static void addStoredXp(ItemStack stack, int points) {
@@ -135,12 +136,12 @@ public class DynamicXpBottleItem extends Item {
      */
     public static int getXpColor(ItemStack stack) {
         int xpPoints = getStoredXp(stack);
-        float t = Math.min(1.0f, (float) xpPoints / 3000.0f);
+        float t = Math.clamp((float) xpPoints / 3000.0f, 0.0f, 1.0f);
         // Интерполяция от яркого салатового (160, 255, 60) к насыщенному тёмно-зелёному (10, 80, 20)
         int r = (int) (160 + t * (10 - 160));
         int g = (int) (255 + t * (80 - 255));
         int b = (int) (60 + t * (20 - 60));
-        return (r << 16) | (g << 8) | b;
+        return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 
     @Override

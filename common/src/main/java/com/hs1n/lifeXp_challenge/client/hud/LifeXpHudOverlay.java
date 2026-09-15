@@ -23,7 +23,7 @@ public class LifeXpHudOverlay {
         }
 
         LocalPlayer player = mc.player;
-        if (player.isSpectator() || player.isCreative()) {
+        if (player.isDeadOrDying() || player.isSpectator() || player.isCreative()) {
             return;
         }
 

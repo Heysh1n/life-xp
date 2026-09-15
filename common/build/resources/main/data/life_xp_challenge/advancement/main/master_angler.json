@@ -1,0 +1,23 @@
+{
+  "parent": "life_xp_challenge:main/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:fishing_rod"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.master_angler.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.master_angler.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fished_xp": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

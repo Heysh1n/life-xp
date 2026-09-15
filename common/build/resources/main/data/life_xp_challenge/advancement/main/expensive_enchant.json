@@ -1,0 +1,28 @@
+{
+  "parent": "life_xp_challenge:main/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.expensive_enchant.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.expensive_enchant.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "enchanted": {
+      "trigger": "minecraft:enchanted_item",
+      "conditions": {
+        "levels": {
+          "min": 30
+        }
+      }
+    }
+  }
+}

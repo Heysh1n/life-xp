@@ -1,0 +1,100 @@
+{
+  "maxLevel": 500,
+  "showDeathCoordinates": true,
+  "deathXpTax": 0.5,
+  "enableKillStreak": true,
+  "showHudBubbles": true,
+  "lockPresetAfterSelection": true,
+  "attributes": {
+    "max_health": {
+      "startValue": -14.0,
+      "midValue": -6.0,
+      "endValue": 4.0,
+      "direction": "DIRECT"
+    },
+    "movement_speed": {
+      "startValue": 0.0,
+      "midValue": 0.005,
+      "endValue": 0.015,
+      "direction": "DIRECT"
+    },
+    "attack_damage": {
+      "startValue": 0.0,
+      "midValue": 1.0,
+      "endValue": 2.5,
+      "direction": "DIRECT"
+    },
+    "attack_speed": {
+      "startValue": 0.0,
+      "midValue": 0.3,
+      "endValue": 0.8,
+      "direction": "DIRECT"
+    },
+    "armor_toughness": {
+      "startValue": 0.0,
+      "midValue": 2.0,
+      "endValue": 4.0,
+      "direction": "DIRECT"
+    },
+    "knockback_resistance": {
+      "startValue": 0.0,
+      "midValue": 0.1,
+      "endValue": 0.25,
+      "direction": "DIRECT"
+    },
+    "block_interaction_range": {
+      "startValue": 0.0,
+      "midValue": 0.3,
+      "endValue": 0.8,
+      "direction": "DIRECT"
+    },
+    "entity_interaction_range": {
+      "startValue": 0.0,
+      "midValue": 0.3,
+      "endValue": 0.8,
+      "direction": "DIRECT"
+    },
+    "block_break_speed": {
+      "startValue": 0.0,
+      "midValue": 0.1,
+      "endValue": 0.3,
+      "direction": "DIRECT"
+    },
+    "sneaking_speed": {
+      "startValue": 0.0,
+      "midValue": 0.03,
+      "endValue": 0.1,
+      "direction": "DIRECT"
+    },
+    "submerged_mining_speed": {
+      "startValue": 0.0,
+      "midValue": 0.5,
+      "endValue": 1.5,
+      "direction": "DIRECT"
+    },
+    "sweeping_damage_ratio": {
+      "startValue": 0.0,
+      "midValue": 0.1,
+      "endValue": 0.3,
+      "direction": "DIRECT"
+    },
+    "safe_fall_distance": {
+      "startValue": 0.0,
+      "midValue": 0.5,
+      "endValue": 1.5,
+      "direction": "DIRECT"
+    },
+    "oxygen_bonus": {
+      "startValue": 0.0,
+      "midValue": 0.0,
+      "endValue": 0.0,
+      "direction": "DIRECT"
+    },
+    "burning_time": {
+      "startValue": 0.0,
+      "midValue": 0.0,
+      "endValue": 0.0,
+      "direction": "INVERSE"
+    }
+  }
+}

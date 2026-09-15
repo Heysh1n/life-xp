@@ -10,6 +10,7 @@ import mezz.jei.api.recipe.vanilla.IJeiBrewingRecipe;
 import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,32 @@ public class LifeXpJeiPlugin implements IModPlugin {
                 ModItems.SHIELD_CORE.get(),
                 Component.translatable("jei.life_xp_challenge.shield_core.info")
         );
+
+        // ── Информационные вкладки зачарований ──
+        List<ItemStack> xpHarvesterBooks = new ArrayList<>();
+        List<ItemStack> anomalyAnglerBooks = new ArrayList<>();
+        ResourceLocation xpHarvesterId = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "xp_harvester");
+        ResourceLocation anomalyAnglerId = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "anomaly_angler");
+
+        for (ItemStack stack : registration.getIngredientManager().getAllItemStacks()) {
+            if (stack.is(Items.ENCHANTED_BOOK)) {
+                ItemEnchantments enchantments = stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
+                for (var entry : enchantments.entrySet()) {
+                    if (entry.getKey().is(xpHarvesterId)) {
+                        xpHarvesterBooks.add(stack);
+                    } else if (entry.getKey().is(anomalyAnglerId)) {
+                        anomalyAnglerBooks.add(stack);
+                    }
+                }
+            }
+        }
+
+        if (!xpHarvesterBooks.isEmpty()) {
+            registration.addItemStackInfo(xpHarvesterBooks, Component.translatable("jei.life_xp_challenge.xp_harvester.info"));
+        }
+        if (!anomalyAnglerBooks.isEmpty()) {
+            registration.addItemStackInfo(anomalyAnglerBooks, Component.translatable("jei.life_xp_challenge.anomaly_angler.info"));
+        }
 
         // ── Рецепты варки зельеварения в JEI ──
         IVanillaRecipeFactory factory = registration.getVanillaRecipeFactory();

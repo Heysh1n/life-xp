@@ -1,0 +1,23 @@
+{
+  "parent": "life_xp_challenge:main/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:diamond_pickaxe"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.miner_vein.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.miner_vein.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mined_xp": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

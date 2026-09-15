@@ -1,0 +1,23 @@
+{
+  "parent": "life_xp_challenge:main/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": {
+      "translate": "advancement.life_xp_challenge.life_or_death.title"
+    },
+    "description": {
+      "translate": "advancement.life_xp_challenge.life_or_death.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "survived": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

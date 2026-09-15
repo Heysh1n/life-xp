@@ -4,7 +4,7 @@
 
 [![Mod Loaders](https://img.shields.io/badge/Mod%20Loaders-Fabric%20%7C%20NeoForge-orange?logo=minecraft&logoColor=white)](https://modrinth.com)
 [![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.1-green?logo=minecraft&logoColor=white)](https://minecraft.net)
-[![Mod Version](https://img.shields.io/badge/Version-1.5.2-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
+[![Mod Version](https://img.shields.io/badge/Version-1.5.4-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
 [![Wiki](https://img.shields.io/badge/Documentation-GitHub%20Wiki-purple?logo=gitbook&logoColor=white)](https://github.com/Heysh1n/life-xp/wiki)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -17,28 +17,30 @@
 ## 📖 What is LIFE-XP Challenge?
 
 **LIFE-XP Challenge** is a hardcore progression and survival overhaul mod for **Minecraft 1.21.1**, developed on a unified **Architectury** monorepo supporting both **Fabric** and **NeoForge** with 100% feature parity.
-
 In vanilla Minecraft, experience levels are trivial—used merely for enchanting or anvil repairs, and mostly forgotten after reaching level 30. **LIFE-XP binds your entire physical existence to your XP bar:**
 
 * You begin vulnerable and fragile (starting with as little as **0.5 hearts** in hardcore mode).
 * Every single experience level dynamically enhances **15 player attributes** (Health, Speed, Attack Damage, Attack Speed, Toughness, Reach, Mining Speed, and more).
 * Your experience functions as an active **Energy Shield**, absorbing incoming attacks before they damage your health via custom alchemy.
+* Data-driven enchantments empower farming, mining, and fishing with high-stakes XP rewards and anomalous treasure catches.
 * Combat streaks grant exponential XP multipliers, but deaths impose a **Smart Death Tax** that heavily penalizes reckless mistakes.
 
 ---
 
-## ✨ Key Features in v1.5.0 (The Performance Overhaul)
+## ✨ Key Features in v1.5.4
 
 | Feature | Description |
 | --- | --- |
 | **$O(1)$ Dynamic Scaling** | 15 player attributes smoothly scale using highly optimized $O(1)$ math. No server freezes, even if you receive 50,000 levels at once. |
+| **Data-Driven Enchantments** | New 1.21.1 enchantments: **XP Harvester** (extra XP from crops, vanilla ores, ancient debris) and **Anomaly Angler** (anomalous fishing loot). |
 | **Clumps-Style XP Merging** | Mobs drop a single, high-value XP orb instead of a laggy fountain. Existing orbs merge dynamically to save server TPS. |
 | **Brewable XP-Shield** | Damage drains XP before health, but only if you brew the custom **XP-Shield Potion** (up to 75% absorption). |
 | **Origins-Style Presets** | First-time joiners are greeted with a mandatory, unclosable GUI to select and permanently lock their difficulty preset. |
 | **Graphical HUD Bubbles** | A clean, visual overlay featuring 10 XP bubbles above the hunger bar and dynamic color-shifting vanilla level text. |
-| **JEI / EMI Integration** | Full in-game documentation! View the entire XP-Shield brewing hierarchy and detailed item manuals directly in your inventory. |
-| **Kill Streak Multiplier** | Up to **+100% XP (2x multiplier)** gained from killing consecutive mobs. Applied directly to the merged drops. |
-| **Dynamic Visual Overlay** | XP-dependent immersive vignette and ambient ash particles at low experience levels (completely replaces legacy fog, resolving chunk culling & render distance drops). |
+| **JEI / EMI Integration** | Full in-game documentation! View brewing hierarchies, utility items, and enchanted books with complete descriptions. |
+| **Modern Data Components** | Fully migrated to Minecraft 1.21.1 Data Components (`life_xp_challenge:stored_xp`, durability, and potion components). |
+| **Dynamic Visual Overlay** | XP-dependent immersive vignette and ambient ash particles at low experience levels (replaces legacy fog with zero chunk culling). |
+| **Trilingual Support** | Complete in-game localization for **English (`en_us`)**, **Russian (`ru_ru`)**, and **Turkish (`tr_tr`)**. |
 
 ---
 
@@ -47,30 +49,30 @@ In vanilla Minecraft, experience levels are trivial—used merely for enchanting
 ### System Requirements
 
 * **Minecraft:** `1.21.1`
-* **Java:** `21+`
+* **Java:** `21` (pinned via Gradle Toolchain; maximum bytecode version supported by Mixin 0.8.7)
 * **Mod Loaders:** `Fabric Loader` or `NeoForge`
+* **Languages:** English (`en_us`), Русский (`ru_ru`), Türkçe (`tr_tr`)
 
 ### Fabric Installation
 
 1. Install [Fabric Loader 1.21.1](https://fabricmc.net/).
 2. Place required dependencies into your `.minecraft/mods/` folder:
-* [Architectury API (Fabric)](https://modrinth.com/mod/architectury-api)
-* [Fabric API](https://modrinth.com/mod/fabric-api)
-* [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
-* *(Optional but Recommended)* [JEI](https://modrinth.com/mod/jei) or [EMI](https://modrinth.com/mod/emi)
-
-
-3. Drop `life_xp_challenge-1.5.0-fabric.jar` into `mods/`.
+   * [Architectury API (Fabric)](https://modrinth.com/mod/architectury-api)
+   * [Fabric API](https://modrinth.com/mod/fabric-api)
+   * [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
+   * *(Optional but Recommended)* [JEI](https://modrinth.com/mod/jei) or [EMI](https://modrinth.com/mod/emi)
+3. Drop `life_xp_challenge-1.5.4-fabric.jar` into `mods/`.
 
 ### NeoForge Installation
 
 1. Install [NeoForge 1.21.1](https://neoforged.net/) (`21.1.77+`).
 2. Place required dependencies into your `.minecraft/mods/` folder:
-* [Architectury API (NeoForge)](https://modrinth.com/mod/architectury-api)
-* [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
+   * [Architectury API (NeoForge)](https://modrinth.com/mod/architectury-api)
+   * [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
+   * *(Optional but Recommended)* [JEI](https://modrinth.com/mod/jei) or [EMI](https://modrinth.com/mod/emi)
+3. Drop `life_xp_challenge-1.5.4-neoforge.jar` into `mods/`.
 
-
-3. Drop `life_xp_challenge-1.5.0-neoforge.jar` into `mods/`.
+---
 
 ## 🧬 Core Progression & Mechanics
 
@@ -85,6 +87,32 @@ $$\text{Value}(L) = \begin{cases}  \text{start} + (\text{mid} - \text{start}) \t
 * **Combat:** Max Health (`max_health`), Attack Damage (`attack_damage`), Attack Speed (`attack_speed`), Sweeping Damage Ratio (`sweeping_damage_ratio`).
 * **Defense & Agility:** Movement Speed (`movement_speed`), Sneak Speed (`sneaking_speed`), Armor Toughness (`armor_toughness`), Knockback Resistance (`knockback_resistance`), Safe Fall Distance (`safe_fall_distance`).
 * **Utility & Survival:** Block Reach (`block_interaction_range`), Entity Reach (`entity_interaction_range`), Mining Speed (`block_break_speed`), Submerged Mining (`submerged_mining_speed`), Underwater Oxygen (`oxygen_bonus`), Fire Burning Duration (`burning_time`).
+
+---
+
+## 🔮 Data-Driven Enchantments & Harvesting
+
+### 1. XP Harvester (`life_xp_challenge:xp_harvester`)
+* **Applicable Tools:** Pickaxes and Hoes (`#minecraft:pickaxes`, `#minecraft:hoes`).
+* **Max Level:** III.
+* **Enchanting Table:** Supported via `#minecraft:enchantment/in_enchanting_table`.
+* **Harvest Drops:**
+  * **Mature Crops:** Harvesting fully-grown crops (`CropBlock` at max age) drops **1–2 Experience Orbs**.
+  * **Vanilla Ores:** Mining Iron, Copper, Gold, Lapis, Redstone, or Diamond ores yields scaled bonus experience based on enchantment level (`level * 2` to `level * 5` XP).
+  * **Ancient Debris:** Drops **1% of the player's total cumulative XP pool** (capped at a maximum of 500 XP per block).
+
+### 2. Anomaly Angler (`life_xp_challenge:anomaly_angler`)
+* **Applicable Tools:** Fishing Rods (`#minecraft:enchantable/fishing`).
+* **Max Level:** I.
+* **Enchanting Table:** Supported via `#minecraft:enchantment/in_enchanting_table`.
+* **Anomalous Catches:**
+  * Injects into `minecraft:gameplay/fishing/treasure` loot table:
+    * **Shield Core (`shield_core`)**: The rare catalyst for brewing XP-Shield potions.
+    * **Damaged Life Bottle (`life_bottle`)**: Salvaged with only 1–2 points of durability remaining (vanilla `minecraft:damage` component).
+    * **Charged Dynamic XP Bottle (`dynamic_xp_bottle`)**: Pre-filled with 5 to 40 stored experience points (`life_xp_challenge:stored_xp` component).
+
+> [!TIP]
+> Both enchantments have dedicated documentation tabs in **JEI** and **EMI**. Press `U` or `R` over an enchanted book in your inventory to view full drop tables and details in English, Russian, or Turkish!
 
 ---
 
@@ -114,8 +142,6 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
 * **Dynamic Vignette Overlay:** When low on experience (`< 50%` of `maxLevel`), a smooth vignette gradually darkens the edges of the screen, reaching full opacity at 0 XP. Completely eliminates fog-related chunk culling and render distance limitations.
 * **Ambient Ash Particles:** At critical XP levels (`< 10%` of cap), dark ash particles (`minecraft:ash`) spawn around the player in a 1.5-block radius with a 30% chance per client tick.
 
-
-
 ---
 
 ## 🧪 Utility Items & Recipes
@@ -124,16 +150,9 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
 
 * The core catalyst for brewing XP-Shield potions.
 
-<!-- Craft visual: place craft image or demo gif in .github/assets/crafts/shield_core.png or .github/assets/gifs/shield_core.gif -->
 <p align="center">
   <img src=".github/assets/crafts/shield_core.png" alt="Shield Core Recipe" onerror="this.style.display='none'"/>
 </p>
-
-```text
-[  Echo Shard  ] [ Amethyst Shard ] [  Ender Eye   ]
-[Amethyst Shard] [ Dynamic XP Bt. ] [Amethyst Shard]
-[  Blaze Rod   ] [ Amethyst Shard ] [  Blaze Rod   ]
-```
 
 ### 2. Life Bottle (`life_bottle`)
 
@@ -141,38 +160,25 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
 * **Void Protection:** Rescues your inventory even if you fall into the End Void.
 * Hold **Shift + Right-Click** to unpack equipment directly into their original slots.
 
-<!-- Craft visual: place craft image or demo gif in .github/assets/crafts/life_bottle.png or .github/assets/gifs/life_bottle.gif -->
 <p align="center">
   <img src=".github/assets/crafts/life_bottle.png" alt="Life Bottle Recipe" onerror="this.style.display='none'"/>
 </p>
-
-```text
-[ Gold Ingot ] [ Amethyst Shard ] [ Gold Ingot ]
-[   Glass    ] [Totem of Undying] [   Glass    ]
-[  Obsidian  ] [  Ender Chest   ] [  Obsidian  ]
-```
 
 ### 3. Dynamic XP Bottle (`dynamic_xp_bottle`)
 
 * Hold **Shift + Right-Click** to siphon player XP into the bottle (10% storage tax).
 * Press **Right-Click** to instantly reclaim stored XP.
+* Uses modern 1.21.1 Data Components (`life_xp_challenge:stored_xp`).
 
-<!-- Craft visual: place craft image or demo gif in .github/assets/crafts/dynamic_xp_bottle.png or .github/assets/gifs/dynamic_xp_bottle.gif -->
 <p align="center">
-  <img src=".github/assets/crafts/dynamic_xp_bottle.png" alt="Dynamic XP Bottle Recipe" onerror="this.style.display='none'"/>
+  <img src=".github/assets/gifs/dynamic_xp_bottle.gif" alt="Dynamic XP Bottle Recipe" onerror="this.style.display='none'"/>
 </p>
-
-```text
-[ Amethyst Shard ] [  Lapis Lazuli  ] [ Amethyst Shard ]
-[  Lapis Lazuli  ] [Bottle o' Ench. ] [  Lapis Lazuli  ]
-[  Redstone Dust ] [  Glass Bottle  ] [  Redstone Dust ]
-```
 
 ---
 
 ## 🎚️ Difficulty Presets
 
-Upon joining the world for the first time, an unclosable GUI will prompt you to choose your destiny. **Once chosen, your preset is locked to your character forever via NBT.**
+Upon joining the world for the first time, an unclosable GUI will prompt you to choose your destiny. **Once chosen, your preset is locked to your character permanently.**
 
 | Setting | ☠ `core` | 💎 `core_no_streaks` | ⚔️ `purist` | 💚 `vanilla_plus` |
 | --- | --- | --- | --- | --- |
@@ -196,12 +202,14 @@ LIFE-XP-Challenge-Architectury/
 │   ├── compat/              # JEI & EMI native integration plugins
 │   ├── config/              # JSON engine, presets, and YACL builder
 │   ├── effect/              # Custom MobEffects (XP-Shield)
+│   ├── event/               # Block break, fishing loot & death handlers
+│   ├── item/                # Life Bottle, Dynamic XP Bottle, Shield Core
+│   ├── loot/                # Custom loot functions & conditions
 │   ├── mixin/               # Clumps-XP optimization & Damage interception
 │   ├── network/             # Architectury S2C/C2S packet networking
 │   └── service/             # Attribute O(1) scaling, Kill Streaks, Advancements
 ├── fabric/                  # Fabric Loader entrypoints & ModMenu integration
 └── neoforge/                # NeoForge entrypoints & IConfigScreenFactory
-
 ```
 
 ---
@@ -214,8 +222,8 @@ For exhaustive technical documentation, developer internals, mixin injection pip
 
 ## 📜 License
 
-[MIT](https://www.google.com/search?q=LICENSE) — © 2026 [Heysh1n](https://github.com/Heysh1n)
+[MIT](LICENSE) — © 2026 [Heysh1n](https://github.com/Heysh1n)
 
 <p align="center">
 Made with ❤️ by Heysh1n
-</p> 
+</p>

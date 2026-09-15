@@ -1,0 +1,114 @@
+{
+  "mappings": {
+    "com/hs1n/lifeXp_challenge/mixin/BlockExperienceMixin": {
+      "tryDropExperience": "Lnet/minecraft/class_2248;method_41420(Lnet/minecraft/class_3218;Lnet/minecraft/class_2338;Lnet/minecraft/class_1799;Lnet/minecraft/class_6017;)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/ExperienceMixin": {
+      "giveExperienceLevels": "Lnet/minecraft/class_1657;method_7316(I)V",
+      "giveExperiencePoints": "Lnet/minecraft/class_1657;method_7255(I)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/ExperienceOrbAccessor": {
+      "count": "field_27009:I",
+      "value": "field_6159:I"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/ExperienceOrbMixin": {
+      "<init>(Lnet/minecraft/world/level/Level;DDDI)V": "Lnet/minecraft/class_1303;<init>(Lnet/minecraft/class_1937;DDDI)V",
+      "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V": "Lnet/minecraft/class_1657;method_6103(Lnet/minecraft/class_1297;I)V",
+      "playerTouch": "Lnet/minecraft/class_1303;method_5694(Lnet/minecraft/class_1657;)V",
+      "tick": "Lnet/minecraft/class_1303;method_5773()V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/FishingHookMixin": {
+      "retrieve": "Lnet/minecraft/class_1536;method_6957(Lnet/minecraft/class_1799;)I"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin": {
+      "dropExperience": "Lnet/minecraft/class_1309;method_23883(Lnet/minecraft/class_1297;)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/MixinAnvilMenu": {
+      "createResult": "Lnet/minecraft/class_1706;method_24928()V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/MixinBottleItem": {
+      "use": "Lnet/minecraft/class_1754;method_7836(Lnet/minecraft/class_1937;Lnet/minecraft/class_1657;Lnet/minecraft/class_1268;)Lnet/minecraft/class_1271;"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/MixinItem": {
+      "getUseAnimation": "Lnet/minecraft/class_1792;method_7853(Lnet/minecraft/class_1799;)Lnet/minecraft/class_1839;",
+      "getUseDuration": "Lnet/minecraft/class_1792;method_7881(Lnet/minecraft/class_1799;Lnet/minecraft/class_1309;)I",
+      "onUseTick": "Lnet/minecraft/class_1792;method_7852(Lnet/minecraft/class_1937;Lnet/minecraft/class_1309;Lnet/minecraft/class_1799;I)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/MixinPlayer": {
+      "dropEquipment": "Lnet/minecraft/class_1657;method_16078()V",
+      "getBaseExperienceReward": "Lnet/minecraft/class_1657;method_6110()I"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/MixinServerPlayer": {
+      "die": "Lnet/minecraft/class_3222;method_6078(Lnet/minecraft/class_1282;)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/PlayerDamageMixin": {
+      "actuallyHurt": "Lnet/minecraft/class_1657;method_6074(Lnet/minecraft/class_1282;F)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/PotionBrewingMixin": {
+      "addVanillaMixes": "Lnet/minecraft/class_1845;method_59699(Lnet/minecraft/class_1845$class_9665;)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/client/MixinAnvilScreen": {
+      "renderLabels": "Lnet/minecraft/class_471;method_2388(Lnet/minecraft/class_332;II)V"
+    },
+    "com/hs1n/lifeXp_challenge/mixin/client/MixinGui": {
+      "renderExperienceLevel": "Lnet/minecraft/class_329;method_56136(Lnet/minecraft/class_332;Lnet/minecraft/class_9779;)V"
+    }
+  },
+  "data": {
+    "named:intermediary": {
+      "com/hs1n/lifeXp_challenge/mixin/BlockExperienceMixin": {
+        "tryDropExperience": "Lnet/minecraft/class_2248;method_41420(Lnet/minecraft/class_3218;Lnet/minecraft/class_2338;Lnet/minecraft/class_1799;Lnet/minecraft/class_6017;)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/ExperienceMixin": {
+        "giveExperienceLevels": "Lnet/minecraft/class_1657;method_7316(I)V",
+        "giveExperiencePoints": "Lnet/minecraft/class_1657;method_7255(I)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/ExperienceOrbAccessor": {
+        "count": "field_27009:I",
+        "value": "field_6159:I"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/ExperienceOrbMixin": {
+        "<init>(Lnet/minecraft/world/level/Level;DDDI)V": "Lnet/minecraft/class_1303;<init>(Lnet/minecraft/class_1937;DDDI)V",
+        "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V": "Lnet/minecraft/class_1657;method_6103(Lnet/minecraft/class_1297;I)V",
+        "playerTouch": "Lnet/minecraft/class_1303;method_5694(Lnet/minecraft/class_1657;)V",
+        "tick": "Lnet/minecraft/class_1303;method_5773()V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/FishingHookMixin": {
+        "retrieve": "Lnet/minecraft/class_1536;method_6957(Lnet/minecraft/class_1799;)I"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/LivingEntityMixin": {
+        "dropExperience": "Lnet/minecraft/class_1309;method_23883(Lnet/minecraft/class_1297;)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/MixinAnvilMenu": {
+        "createResult": "Lnet/minecraft/class_1706;method_24928()V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/MixinBottleItem": {
+        "use": "Lnet/minecraft/class_1754;method_7836(Lnet/minecraft/class_1937;Lnet/minecraft/class_1657;Lnet/minecraft/class_1268;)Lnet/minecraft/class_1271;"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/MixinItem": {
+        "getUseAnimation": "Lnet/minecraft/class_1792;method_7853(Lnet/minecraft/class_1799;)Lnet/minecraft/class_1839;",
+        "getUseDuration": "Lnet/minecraft/class_1792;method_7881(Lnet/minecraft/class_1799;Lnet/minecraft/class_1309;)I",
+        "onUseTick": "Lnet/minecraft/class_1792;method_7852(Lnet/minecraft/class_1937;Lnet/minecraft/class_1309;Lnet/minecraft/class_1799;I)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/MixinPlayer": {
+        "dropEquipment": "Lnet/minecraft/class_1657;method_16078()V",
+        "getBaseExperienceReward": "Lnet/minecraft/class_1657;method_6110()I"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/MixinServerPlayer": {
+        "die": "Lnet/minecraft/class_3222;method_6078(Lnet/minecraft/class_1282;)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/PlayerDamageMixin": {
+        "actuallyHurt": "Lnet/minecraft/class_1657;method_6074(Lnet/minecraft/class_1282;F)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/PotionBrewingMixin": {
+        "addVanillaMixes": "Lnet/minecraft/class_1845;method_59699(Lnet/minecraft/class_1845$class_9665;)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/client/MixinAnvilScreen": {
+        "renderLabels": "Lnet/minecraft/class_471;method_2388(Lnet/minecraft/class_332;II)V"
+      },
+      "com/hs1n/lifeXp_challenge/mixin/client/MixinGui": {
+        "renderExperienceLevel": "Lnet/minecraft/class_329;method_56136(Lnet/minecraft/class_332;Lnet/minecraft/class_9779;)V"
+      }
+    }
+  }
+}

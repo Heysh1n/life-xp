@@ -22,10 +22,15 @@ public class LifeXpChallenge {
     public static void init() {
         LifeXpConfig.load();
         
+        com.hs1n.lifeXp_challenge.registry.ModDataComponents.init();
         ModItems.ITEMS.register();
         com.hs1n.lifeXp_challenge.registry.ModMobEffects.init();
         com.hs1n.lifeXp_challenge.registry.ModPotions.init();
+        com.hs1n.lifeXp_challenge.registry.ModLootFunctions.init();
         ModCreativeTabs.CREATIVE_MODE_TABS.register();
+
+        com.hs1n.lifeXp_challenge.event.BlockBreakHandler.init();
+        com.hs1n.lifeXp_challenge.event.FishingLootHandler.init();
 
         com.hs1n.lifeXp_challenge.network.LifeXpNetworking.registerServerReceiver();
 
