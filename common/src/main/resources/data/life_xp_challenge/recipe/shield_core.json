@@ -2,19 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "YAY",
+    "OAO",
     "ADA",
-    "ERE"
+    "OAO"
   ],
   "key": {
     "D": "life_xp_challenge:dynamic_xp_bottle",
     "A": "minecraft:amethyst_shard",
-    "E": "minecraft:echo_shard",
-    "Y": "minecraft:ender_eye",
-    "R": "minecraft:blaze_rod"
+    "O": "minecraft:obsidian"
   },
   "result": {
-    "count": 1,
+    "count": 2,
     "id": "life_xp_challenge:shield_core"
   }
 }

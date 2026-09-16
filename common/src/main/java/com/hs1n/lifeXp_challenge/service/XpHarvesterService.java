@@ -59,6 +59,10 @@ public final class XpHarvesterService {
         if (!(level instanceof ServerLevel serverLevel) || player == null || player.isCreative()) {
             return EventResult.pass();
         }
+        // Skip if vein mining is in progress (prevents recursive triggers)
+        if (OreVeinMinerService.IS_VEIN_MINING.get()) {
+            return EventResult.pass();
+        }
 
         ItemStack tool = player.getMainHandItem();
         int enchantLevel = getHarvesterLevel(tool);
@@ -90,7 +94,11 @@ public final class XpHarvesterService {
         int bonusXp = calculateOreBonus(state, enchantLevel, random);
         if (bonusXp > 0) {
             spawnOreXp(serverLevel, Vec3.atCenterOf(pos), bonusXp);
+            AdvancementService.addOreXp(player, bonusXp);
         }
+
+        // 4. Ore Vein Miner (XP Harvester level >= 2 on pickaxe)
+        OreVeinMinerService.tryVeinMine(serverLevel, player, pos, state, tool, enchantLevel);
 
         return EventResult.pass();
     }

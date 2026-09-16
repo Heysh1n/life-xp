@@ -19,5 +19,8 @@
     "reached": {
       "trigger": "minecraft:impossible"
     }
+  },
+  "rewards": {
+    "experience": 100
   }
 }

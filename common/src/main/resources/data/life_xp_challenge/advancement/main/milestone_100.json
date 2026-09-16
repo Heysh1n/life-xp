@@ -19,5 +19,11 @@
     "reached": {
       "trigger": "minecraft:impossible"
     }
+  },
+  "rewards": {
+    "experience": 1500,
+    "loot": [
+      "life_xp_challenge:rewards/milestone_100"
+    ]
   }
 }

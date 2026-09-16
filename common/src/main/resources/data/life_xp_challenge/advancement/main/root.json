@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancement.life_xp_challenge.root.desc"
     },
-    "background": "life_xp_challenge:textures/gui/advancements/backgrounds/root_bg.png",
+    "background": "life_xp_challenge:gui/advancements/backgrounds/root",
     "show_toast": false,
     "announce_to_chat": false,
     "hidden": false

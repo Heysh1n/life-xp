@@ -2,14 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    " T ",
-    "ECE",
+    "BCB",
     " B "
   ],
   "key": {
-    "T": "minecraft:totem_of_undying",
-    "E": "minecraft:ender_eye",
-    "C": "minecraft:chest",
+    "C": "minecraft:ender_chest",
     "B": "minecraft:glass_bottle"
   },
   "result": {
