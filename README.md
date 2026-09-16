@@ -3,8 +3,8 @@
 # 🌟 LIFE-XP Challenge
 
 [![Mod Loaders](https://img.shields.io/badge/Mod%20Loaders-Fabric%20%7C%20NeoForge-orange?logo=minecraft&logoColor=white)](https://modrinth.com)
-[![Minecraft Version](https://img.shields.io/badge/Minecraft-26.1.1-green?logo=minecraft&logoColor=white)](https://minecraft.net)
-[![Mod Version](https://img.shields.io/badge/Version-1.6.0-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
+[![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2-green?logo=minecraft&logoColor=white)](https://minecraft.net)
+[![Mod Version](https://img.shields.io/badge/Version-1.6.1-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
 [![Wiki](https://img.shields.io/badge/Documentation-GitHub%20Wiki-purple?logo=gitbook&logoColor=white)](https://github.com/Heysh1n/life-xp/wiki)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -46,13 +46,13 @@ In vanilla Minecraft, experience levels are trivial—used merely for enchanting
 
 ### System Requirements
 
-* **Minecraft:** `26.1.1`
+* **Minecraft:** `26.2`
 * **Java:** `25+`
 * **Mod Loaders:** `Fabric Loader` or `NeoForge`
 
 ### Fabric Installation
 
-1. Install [Fabric Loader 26.1.1](https://fabricmc.net/).
+1. Install [Fabric Loader 26.2](https://fabricmc.net/).
 2. Place required dependencies into your `.minecraft/mods/` folder:
 * [Architectury API (Fabric)](https://modrinth.com/mod/architectury-api)
 * [Fabric API](https://modrinth.com/mod/fabric-api)
@@ -64,7 +64,7 @@ In vanilla Minecraft, experience levels are trivial—used merely for enchanting
 
 ### NeoForge Installation
 
-1. Install [NeoForge 26.1.1](https://neoforged.net/).
+1. Install [NeoForge 26.2](https://neoforged.net/).
 2. Place required dependencies into your `.minecraft/mods/` folder:
 * [Architectury API (NeoForge)](https://modrinth.com/mod/architectury-api)
 * [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
