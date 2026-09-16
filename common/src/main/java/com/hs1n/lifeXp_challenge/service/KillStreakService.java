@@ -26,7 +26,7 @@ public class KillStreakService {
         // Каждые 10 убийств уведомляем игрока (опционально)
         if (streak % 10 == 0) {
             double bonus = streak * STREAK_BONUS_PER_KILL * 100;
-            player.displayClientMessage(Component.translatable("lifexp.message.kill_streak", streak, (int)bonus).withStyle(net.minecraft.ChatFormatting.GOLD), true);
+            player.sendOverlayMessage(Component.translatable("lifexp.message.kill_streak", streak, (int)bonus).withStyle(net.minecraft.ChatFormatting.GOLD));
         }
     }
 

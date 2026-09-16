@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,14 +20,13 @@ public abstract class LivingEntityMixin {
     @Shadow public abstract boolean shouldDropExperience();
     @Shadow public abstract int getExperienceReward(ServerLevel level, Entity killer);
     @Shadow protected abstract boolean isAlwaysExperienceDropper();
-    @Shadow protected int lastHurtByPlayerTime;
+    @Shadow public abstract int getLastHurtByPlayerMemoryTime();
 
     @Inject(method = "dropExperience", at = @At("HEAD"), cancellable = true)
-    private void lifeXp$clumpMobDropExperience(Entity entity, CallbackInfo ci) {
+    private void lifeXp$clumpMobDropExperience(ServerLevel serverLevel, Entity entity, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (self.level() instanceof ServerLevel serverLevel
-                && !this.wasExperienceConsumed()
-                && (this.isAlwaysExperienceDropper() || (this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && serverLevel.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)))) {
+        if (!this.wasExperienceConsumed()
+                && (this.isAlwaysExperienceDropper() || (this.getLastHurtByPlayerMemoryTime() > 0 && this.shouldDropExperience() && serverLevel.getGameRules().get(GameRules.MOB_DROPS)))) {
             int reward = this.getExperienceReward(serverLevel, entity);
             if (entity instanceof ServerPlayer player) {
                 reward = KillStreakService.modifyExperience(player, reward);

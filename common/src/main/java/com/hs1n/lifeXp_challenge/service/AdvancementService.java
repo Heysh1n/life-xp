@@ -4,18 +4,18 @@ import com.hs1n.lifeXp_challenge.LifeXpChallenge;
 import com.hs1n.lifeXp_challenge.registry.ModMobEffects;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 
 public class AdvancementService {
 
-    public static final ResourceLocation LIFE_OR_DEATH =
-            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/life_or_death");
-    public static final ResourceLocation MINER_VEIN =
-            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/miner_vein");
-    public static final ResourceLocation MASTER_ANGLER =
-            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/master_angler");
+    public static final Identifier LIFE_OR_DEATH =
+            Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/life_or_death");
+    public static final Identifier MINER_VEIN =
+            Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/miner_vein");
+    public static final Identifier MASTER_ANGLER =
+            Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/master_angler");
 
     private static final String TAG_PREFIX_ORE_XP = "lifexp_ore_xp_";
     private static final String TAG_PREFIX_FISH_XP = "lifexp_fish_xp_";
@@ -48,14 +48,14 @@ public class AdvancementService {
         }
     }
 
-    public static boolean isAdvancementDone(ServerPlayer player, ResourceLocation id) {
-        AdvancementHolder advancement = player.server.getAdvancements().get(id);
+    public static boolean isAdvancementDone(ServerPlayer player, Identifier id) {
+        AdvancementHolder advancement = player.level().getServer().getAdvancements().get(id);
         if (advancement == null) return false;
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
-    public static void grantAdvancement(ServerPlayer player, ResourceLocation advancementId) {
-        AdvancementHolder advancement = player.server.getAdvancements().get(advancementId);
+    public static void grantAdvancement(ServerPlayer player, Identifier advancementId) {
+        AdvancementHolder advancement = player.level().getServer().getAdvancements().get(advancementId);
         if (advancement != null) {
             AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
             if (!progress.isDone()) {
@@ -67,7 +67,7 @@ public class AdvancementService {
     }
 
     private static int getPlayerTagCount(ServerPlayer player, String prefix) {
-        for (String tag : player.getTags()) {
+        for (String tag : player.entityTags()) {
             if (tag.startsWith(prefix)) {
                 try {
                     return Integer.parseInt(tag.substring(prefix.length()));
@@ -79,7 +79,7 @@ public class AdvancementService {
     }
 
     private static void setPlayerTagCount(ServerPlayer player, String prefix, int count) {
-        player.getTags().removeIf(tag -> tag.startsWith(prefix));
+        player.entityTags().removeIf(tag -> tag.startsWith(prefix));
         player.addTag(prefix + count);
     }
 }

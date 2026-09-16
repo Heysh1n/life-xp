@@ -24,9 +24,6 @@
     ],
     "jei_mod_plugin": [
       "com.hs1n.lifeXp_challenge.compat.jei.LifeXpJeiPlugin"
-    ],
-    "emi": [
-      "com.hs1n.lifeXp_challenge.compat.emi.LifeXpEmiPlugin"
     ]
   },
   "mixins": [
@@ -37,9 +34,9 @@
     }
   ],
   "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": "1.21.1",
-    "modmenu": ">=11.0.3",
+    "fabricloader": ">=0.19.5",
+    "minecraft": ">=26.2",
+    "java": ">=25",
     "architectury": "*"
   }
 }

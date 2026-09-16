@@ -3,7 +3,7 @@ package com.hs1n.lifeXp_challenge.mixin;
 import com.hs1n.lifeXp_challenge.util.ExperienceSourceHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -21,15 +21,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BlockExperienceMixin {
 
     @Unique
-    private static final TagKey<Block> COMMON_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
+    private static final TagKey<Block> COMMON_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores"));
+    @Unique
+    private static final TagKey<Block> COAL_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "coal_ores"));
+    @Unique
+    private static final TagKey<Block> DIAMOND_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    @Unique
+    private static final TagKey<Block> EMERALD_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "emerald_ores"));
+    @Unique
+    private static final TagKey<Block> LAPIS_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    @Unique
+    private static final TagKey<Block> REDSTONE_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "redstone_ores"));
 
     @Unique
     private static boolean lifeXp$isOre(BlockState state) {
-        return state.is(BlockTags.COAL_ORES)
-                || state.is(BlockTags.DIAMOND_ORES)
-                || state.is(BlockTags.EMERALD_ORES)
-                || state.is(BlockTags.LAPIS_ORES)
-                || state.is(BlockTags.REDSTONE_ORES)
+        return state.is(COAL_ORES)
+                || state.is(DIAMOND_ORES)
+                || state.is(EMERALD_ORES)
+                || state.is(LAPIS_ORES)
+                || state.is(REDSTONE_ORES)
                 || state.is(BlockTags.GOLD_ORES)
                 || state.is(BlockTags.IRON_ORES)
                 || state.is(BlockTags.COPPER_ORES)

@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancement.life_xp_challenge.root.desc"
     },
-    "background": "minecraft:textures/gui/advancements/backgrounds/end.png",
+    "background": "life_xp_challenge:textures/gui/advancements/backgrounds/root_bg.png",
     "show_toast": false,
     "announce_to_chat": false,
     "hidden": false

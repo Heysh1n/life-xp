@@ -8,6 +8,7 @@ import com.hs1n.lifeXp_challenge.service.AttributeService;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.hs1n.lifeXp_challenge.util.MessageUtils;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,6 +17,10 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.ClickEvent;
+import java.util.List;
+import java.util.ArrayList;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,13 +41,15 @@ public final class LifeXpCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("lifexp")
-                .requires(source -> source.hasPermission(2))
+                .requires(source -> source.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))
 
                 .then(Commands.literal("reload")
                         .executes(LifeXpCommand::executeReload))
 
                 .then(Commands.literal("status")
-                        .executes(LifeXpCommand::executeStatus))
+                        .executes(ctx -> executeStatus(ctx, 1))
+                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                .executes(ctx -> executeStatus(ctx, IntegerArgumentType.getInteger(ctx, "page")))))
 
                 .then(Commands.literal("get")
                         .then(Commands.literal("maxLevel")
@@ -99,50 +106,91 @@ public final class LifeXpCommand {
         LifeXpConfig.load();
         int count = recalculateAllPlayers(ctx.getSource().getServer());
         ctx.getSource().sendSuccess(
-                () -> prefix().append(Component.translatable("lifexp.command.reload.success", count)
+                () -> MessageUtils.prefixShort().append(Component.translatable("lifexp.command.reload.success", count)
                         .withStyle(ChatFormatting.GREEN)),
                 true);
         return count;
     }
 
-    private static int executeStatus(CommandContext<CommandSourceStack> ctx) {
+    private static int executeStatus(CommandContext<CommandSourceStack> ctx, int page) {
         LifeXpConfig cfg = LifeXpConfig.INSTANCE;
         CommandSourceStack source = ctx.getSource();
 
-        source.sendSuccess(() -> Component.translatable("lifexp.command.status.header")
-                .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
+        List<Map.Entry<String, AttributeConfigNode>> entries = new ArrayList<>(cfg.getNodes().entrySet());
+        int itemsPerPage = 5;
+        int totalPages = (int) Math.ceil((double) entries.size() / itemsPerPage);
 
-        source.sendSuccess(() -> Component.translatable("lifexp.command.status.general",
-                        cfg.getMaxLevel(),
-                        cfg.getDeathXpTax(),
-                        cfg.isShowDeathCoordinates() ? "ON" : "OFF")
-                .withStyle(ChatFormatting.YELLOW), false);
+        if (page > totalPages) page = totalPages;
+        if (page < 1) page = 1;
 
-        source.sendSuccess(() -> Component.translatable("lifexp.command.status.visuals")
-                .withStyle(ChatFormatting.AQUA), false);
+        // Header: GOLD + DARK_GRAY
+        source.sendSuccess(() -> Component.literal("====== ").withStyle(ChatFormatting.DARK_GRAY)
+                .append(Component.literal("Статус LifeXP").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD))
+                .append(Component.literal(" ======").withStyle(ChatFormatting.DARK_GRAY)), false);
 
-        source.sendSuccess(() -> Component.translatable("lifexp.command.status.attr_header")
-                .withStyle(ChatFormatting.GRAY), false);
+        if (page == 1) {
+            source.sendSuccess(() -> Component.translatable("lifexp.command.status.general",
+                            cfg.getMaxLevel(),
+                            cfg.getDeathXpTax(),
+                            cfg.isShowDeathCoordinates() ? "ON" : "OFF")
+                    .withStyle(ChatFormatting.YELLOW), false);
 
-        for (Map.Entry<String, AttributeConfigNode> entry : cfg.getNodes().entrySet()) {
+            source.sendSuccess(() -> Component.translatable("lifexp.command.status.visuals")
+                    .withStyle(ChatFormatting.AQUA), false);
+        }
+
+        source.sendSuccess(() -> Component.literal(""), false);
+
+        int start = (page - 1) * itemsPerPage;
+        int end = Math.min(start + itemsPerPage, entries.size());
+
+        for (int i = start; i < end; i++) {
+            Map.Entry<String, AttributeConfigNode> entry = entries.get(i);
             String key = entry.getKey();
             AttributeConfigNode node = entry.getValue();
-            String dir = node.getDirection() == DifficultyDirection.INVERSE ? "↑=Harder" : "↑=Easier";
-            source.sendSuccess(() -> Component.translatable("lifexp.command.status.attr",
-                            key,
-                            node.getStartValue(),
-                            node.getMidValue(),
-                            node.getEndValue(),
-                            dir)
-                    .withStyle(ChatFormatting.GRAY), false);
+            
+            Component hoverText = Component.literal("Значение на 50%: ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(String.valueOf(node.getMidValue())).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("\nСкейлинг: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(node.getDirection() == DifficultyDirection.INVERSE ? "Обратный (Сложнее)" : "Прямой (Легче)").withStyle(ChatFormatting.YELLOW));
+
+            Component details = Component.literal(" [Детали...]").withStyle(style -> style
+                .withColor(ChatFormatting.DARK_GREEN)
+                .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(hoverText)));
+
+            source.sendSuccess(() -> Component.literal("  • ").withStyle(ChatFormatting.DARK_GRAY)
+                    .append(Component.translatable("lifexp.attr." + key).withStyle(ChatFormatting.GOLD))
+                    .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                    .append(Component.literal(String.valueOf(node.getStartValue())).withStyle(ChatFormatting.WHITE))
+                    .append(Component.literal(" ➔ ").withStyle(ChatFormatting.DARK_GRAY))
+                    .append(Component.literal(String.valueOf(node.getEndValue())).withStyle(ChatFormatting.WHITE))
+                    .append(details), false);
         }
+
+        source.sendSuccess(() -> Component.literal(""), false);
+
+        final int finalPage = page;
+        // Footer Pagination
+        Component prev = page > 1 
+            ? Component.literal("[◀]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/lifexp status " + (finalPage - 1))))
+            : Component.literal("[◀]").withStyle(ChatFormatting.DARK_GRAY);
+
+        Component next = page < totalPages 
+            ? Component.literal("[▶]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/lifexp status " + (finalPage + 1))))
+            : Component.literal("[▶]").withStyle(ChatFormatting.DARK_GRAY);
+
+        
+        source.sendSuccess(() -> Component.literal("    ")
+                .append(prev)
+                .append(Component.literal(" Страница " + finalPage + " из " + totalPages + " ").withStyle(ChatFormatting.GRAY))
+                .append(next), false);
 
         return 1;
     }
 
     private static int executeGetSimple(CommandContext<CommandSourceStack> ctx, String param, String value) {
         ctx.getSource().sendSuccess(
-                () -> prefix().append(Component.translatable("lifexp.command.get.value", param, value)
+                () -> MessageUtils.prefixShort().append(Component.translatable("lifexp.command.get.value", param, value)
                         .withStyle(ChatFormatting.YELLOW)),
                 false);
         return 1;
@@ -153,21 +201,27 @@ public final class LifeXpCommand {
         AttributeConfigNode node = LifeXpConfig.INSTANCE.getNode(attrName);
         if (node == null) {
             ctx.getSource().sendFailure(
-                    prefix().append(Component.translatable("lifexp.command.error.unknown_attr", attrName)
+                    MessageUtils.prefixShort().append(Component.translatable("lifexp.command.error.unknown_attr", attrName)
                             .withStyle(ChatFormatting.RED)));
             return 0;
         }
 
-        String dir = node.getDirection() == DifficultyDirection.INVERSE ? "↑=Harder" : "↑=Easier";
-        ctx.getSource().sendSuccess(
-                () -> prefix().append(Component.translatable("lifexp.command.status.attr",
-                                attrName,
-                                node.getStartValue(),
-                                node.getMidValue(),
-                                node.getEndValue(),
-                                dir)
-                        .withStyle(ChatFormatting.YELLOW)),
-                false);
+        Component hoverText = Component.literal("Значение на 50%: ").withStyle(ChatFormatting.GRAY)
+            .append(Component.literal(String.valueOf(node.getMidValue())).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal("\nСкейлинг: ").withStyle(ChatFormatting.GRAY))
+            .append(Component.literal(node.getDirection() == DifficultyDirection.INVERSE ? "Обратный (Сложнее)" : "Прямой (Легче)").withStyle(ChatFormatting.YELLOW));
+
+        Component details = Component.literal(" [Детали...]").withStyle(style -> style
+            .withColor(ChatFormatting.DARK_GREEN)
+            .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(hoverText)));
+
+        ctx.getSource().sendSuccess(() -> MessageUtils.prefixShort()
+                .append(Component.translatable("lifexp.attr." + attrName).withStyle(ChatFormatting.GOLD))
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(String.valueOf(node.getStartValue())).withStyle(ChatFormatting.WHITE))
+                .append(Component.literal(" ➔ ").withStyle(ChatFormatting.DARK_GRAY))
+                .append(Component.literal(String.valueOf(node.getEndValue())).withStyle(ChatFormatting.WHITE))
+                .append(details), false);
         return 1;
     }
 
@@ -197,7 +251,7 @@ public final class LifeXpCommand {
         AttributeConfigNode node = LifeXpConfig.INSTANCE.getNode(attrName);
         if (node == null) {
             ctx.getSource().sendFailure(
-                    prefix().append(Component.translatable("lifexp.command.error.unknown_attr", attrName)
+                    MessageUtils.prefixShort().append(Component.translatable("lifexp.command.error.unknown_attr", attrName)
                             .withStyle(ChatFormatting.RED)));
             return 0;
         }
@@ -218,8 +272,8 @@ public final class LifeXpCommand {
         ServerPlayer player = source.getPlayer();
 
         // Проверяем перманентную блокировку выбора пресета (Origins-style)
-        if (LifeXpConfig.INSTANCE.isLockPresetAfterSelection() && player != null && player.getTags().contains(PRESET_TAG)) {
-            source.sendFailure(prefix().append(Component.translatable("lifexp.error.preset_locked")
+        if (LifeXpConfig.INSTANCE.isLockPresetAfterSelection() && player != null && player.entityTags().contains(PRESET_TAG)) {
+            source.sendFailure(MessageUtils.prefixShort().append(Component.translatable("lifexp.error.preset_locked")
                     .withStyle(ChatFormatting.RED)));
             return 0;
         }
@@ -228,7 +282,7 @@ public final class LifeXpCommand {
 
         if (!LifeXpPresets.apply(name)) {
             source.sendFailure(
-                    prefix().append(Component.translatable("lifexp.command.error.unknown_preset", name)
+                    MessageUtils.prefixShort().append(Component.translatable("lifexp.command.error.unknown_preset", name)
                             .withStyle(ChatFormatting.RED)));
             return 0;
         }
@@ -241,7 +295,7 @@ public final class LifeXpCommand {
         LifeXpConfig.save();
         int count = recalculateAllPlayers(source.getServer());
         source.sendSuccess(
-                () -> prefix().append(Component.translatable("lifexp.command.preset.applied", name, count)
+                () -> MessageUtils.prefixShort().append(Component.translatable("lifexp.command.preset.applied", name, count)
                         .withStyle(ChatFormatting.GREEN)),
                 true);
         return count;
@@ -249,12 +303,12 @@ public final class LifeXpCommand {
 
     private static int executeExport(CommandContext<CommandSourceStack> ctx) {
         String json = LifeXpConfig.exportToJsonString();
-        ctx.getSource().sendSuccess(() -> prefix().append(Component.translatable("lifexp.command.export.success")
+        ctx.getSource().sendSuccess(() -> MessageUtils.prefixShort().append(Component.translatable("lifexp.command.export.success")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GREEN)
                         .withUnderlined(true)
-                        .withClickEvent(new net.minecraft.network.chat.ClickEvent(net.minecraft.network.chat.ClickEvent.Action.COPY_TO_CLIPBOARD, json))
-                        .withHoverEvent(new net.minecraft.network.chat.HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.translatable("lifexp.command.export.hover"))))), false);
+                        .withClickEvent(new net.minecraft.network.chat.ClickEvent.CopyToClipboard(json))
+                        .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(Component.translatable("lifexp.command.export.hover"))))), false);
         return 1;
     }
 
@@ -262,27 +316,40 @@ public final class LifeXpCommand {
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>(ctx.getSource().getServer().getPlayerList().getPlayers());
         players.sort((p1, p2) -> Integer.compare(p2.experienceLevel, p1.experienceLevel));
 
-        ctx.getSource().sendSuccess(() -> Component.translatable("lifexp.command.top.header").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
+        ctx.getSource().sendSuccess(() -> Component.literal("====== ").withStyle(ChatFormatting.DARK_GRAY)
+                .append(Component.literal("Топ Игроков").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD))
+                .append(Component.literal(" ======").withStyle(ChatFormatting.DARK_GRAY)), false);
+                
         int rank = 1;
         for (ServerPlayer player : players) {
             final int currentRank = rank;
-            ctx.getSource().sendSuccess(() -> Component.translatable("lifexp.command.top.entry", currentRank, player.getScoreboardName(), player.experienceLevel)
-                    .withStyle(currentRank <= 3 ? ChatFormatting.YELLOW : ChatFormatting.WHITE), false);
+            
+            ChatFormatting color = ChatFormatting.WHITE;
+            if (currentRank == 1) color = ChatFormatting.GOLD;
+            else if (currentRank == 2) color = ChatFormatting.GRAY;
+            
+            
+            if (currentRank == 3) color = ChatFormatting.RED;
+            if (currentRank > 3) color = ChatFormatting.DARK_GRAY;
+
+            final ChatFormatting finalColor = color;
+            ctx.getSource().sendSuccess(() -> Component.literal("  #" + currentRank + " ").withStyle(finalColor, ChatFormatting.BOLD)
+                    .append(player.getDisplayName().copy().withStyle(ChatFormatting.AQUA))
+                    .append(Component.literal(" - Уровень ").withStyle(ChatFormatting.GRAY))
+                    .append(Component.literal(String.valueOf(player.experienceLevel)).withStyle(ChatFormatting.YELLOW)), false);
             rank++;
             if (rank > 10) break;
         }
+        
+        ctx.getSource().sendSuccess(() -> Component.literal("=====================").withStyle(ChatFormatting.DARK_GRAY), false);
         return 1;
-    }
-
-    private static MutableComponent prefix() {
-        return Component.translatable("lifexp.message.prefix_short").withStyle(ChatFormatting.GOLD);
     }
 
     private static int saveAndNotify(CommandContext<CommandSourceStack> ctx, String param, String value) {
         LifeXpConfig.save();
         int count = recalculateAllPlayers(ctx.getSource().getServer());
         ctx.getSource().sendSuccess(
-                () -> prefix().append(Component.translatable("lifexp.command.set.success", param, value)
+                () -> MessageUtils.prefixShort().append(Component.translatable("lifexp.command.set.success", param, value)
                         .withStyle(ChatFormatting.GREEN)),
                 true);
         return count > 0 ? count : 1;

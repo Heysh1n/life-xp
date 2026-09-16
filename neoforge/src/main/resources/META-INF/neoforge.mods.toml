@@ -12,6 +12,13 @@ logoFile="assets/life_xp_challenge/icon.png"
 issueTrackerURL="https://github.com/Heysh1n/life-xp"
 
 [[dependencies."life_xp_challenge"]]
+    modId="java"
+    type="required"
+    versionRange="[25,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies."life_xp_challenge"]]
     modId="neoforge"
     type="required"
     versionRange="[21,)"

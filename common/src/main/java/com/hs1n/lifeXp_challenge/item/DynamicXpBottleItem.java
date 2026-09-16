@@ -1,27 +1,24 @@
 package com.hs1n.lifeXp_challenge.item;
 
+import com.hs1n.lifeXp_challenge.registry.ModDataComponents;
 import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Динамический пузырёк опыта, хранящий точное количество очков опыта в Data Components.
@@ -30,23 +27,20 @@ import java.util.List;
  */
 public class DynamicXpBottleItem extends Item {
 
-    public static final String NBT_STORED_XP = "StoredXp";
-
     public DynamicXpBottleItem(Item.Properties properties) {
         super(properties);
     }
 
     public static int getStoredXp(ItemStack stack) {
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        if (customData == null) return 0;
-        CompoundTag tag = customData.copyTag();
-        return tag.getInt(NBT_STORED_XP);
+        return stack.getOrDefault(ModDataComponents.STORED_XP.get(), 0);
     }
 
     public static void setStoredXp(ItemStack stack, int points) {
-        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> {
-            tag.putInt(NBT_STORED_XP, Math.max(0, points));
-        });
+        if (points <= 0) {
+            stack.remove(ModDataComponents.STORED_XP.get());
+        } else {
+            stack.set(ModDataComponents.STORED_XP.get(), points);
+        }
     }
 
     public static void addStoredXp(ItemStack stack, int points) {
@@ -61,20 +55,20 @@ public class DynamicXpBottleItem extends Item {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (player.isShiftKeyDown()) {
             if (ExperienceUtils.getPlayerTotalXp(player) > 0) {
                 player.startUsingItem(hand);
-                return InteractionResultHolder.consume(stack);
+                return InteractionResult.CONSUME;
             } else {
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
         } else {
             // Обычный ПКМ — поглощение опыта
@@ -93,11 +87,11 @@ public class DynamicXpBottleItem extends Item {
                         player.drop(emptyBottle, false);
                     }
                 }
-                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+                return InteractionResult.SUCCESS;
             }
         }
 
-        return InteractionResultHolder.pass(stack);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -140,7 +134,7 @@ public class DynamicXpBottleItem extends Item {
         int r = (int) (160 + t * (10 - 160));
         int g = (int) (255 + t * (80 - 255));
         int b = (int) (60 + t * (20 - 60));
-        return (r << 16) | (g << 8) | b;
+        return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 
     @Override
@@ -149,18 +143,18 @@ public class DynamicXpBottleItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
         int storedXp = getStoredXp(stack);
         int approxLevels = ExperienceUtils.calculateLevelFromXp(storedXp);
 
-        tooltip.add(Component.translatable("lifexp.xp_bottle.stored_points", storedXp, approxLevels)
+        tooltip.accept(Component.translatable("lifexp.xp_bottle.stored_points", storedXp, approxLevels)
                 .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
 
-        if (Screen.hasShiftDown()) {
-            tooltip.add(Component.translatable("item.life_xp_challenge.dynamic_xp_bottle.desc")
+        if (Minecraft.getInstance().hasShiftDown()) {
+            tooltip.accept(Component.translatable("item.life_xp_challenge.dynamic_xp_bottle.desc")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
-            tooltip.add(Component.translatable("lifexp.tooltip.hold_shift")
+            tooltip.accept(Component.translatable("lifexp.tooltip.hold_shift")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
     }

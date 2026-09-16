@@ -243,7 +243,7 @@ public class LifeXpConfigScreen {
     private static void applyPresetAndReopen(Screen currentScreen, Screen parent, Runnable presetApplier) {
         presetApplier.run();
         LifeXpConfig.save();
-        Minecraft.getInstance().setScreen(create(parent));
+        Minecraft.getInstance().setScreenAndShow(create(parent));
     }
 
 }

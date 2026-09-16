@@ -1,24 +1,25 @@
 package com.hs1n.lifeXp_challenge.service;
 
 import com.hs1n.lifeXp_challenge.item.LifeBottleItem;
+import com.hs1n.lifeXp_challenge.registry.ModDataComponents;
 import com.hs1n.lifeXp_challenge.registry.ModItems;
 import com.hs1n.lifeXp_challenge.util.MessageUtils;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Сервис управления сохранением и восстановлением инвентаря через Пузырёк Жизни (Data Components 1.21.1).
+ * Сервис управления сохранением и восстановлением инвентаря через Пузырёк Жизни (Data Components).
  */
 public final class LifeBottleService {
 
@@ -39,7 +40,7 @@ public final class LifeBottleService {
      * @return true, если инвентарь был упакован в бутылёк и стандартный дроп отменяется.
      */
     public static boolean handleDeathInventory(ServerPlayer player) {
-        if (player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+        if (player.level().getGameRules().get(GameRules.KEEP_INVENTORY)) {
             return false;
         }
 
@@ -52,8 +53,8 @@ public final class LifeBottleService {
         ItemStack bottleStack = ItemStack.EMPTY;
 
         // Основной инвентарь (0..35)
-        for (int i = 0; i < inventory.items.size(); i++) {
-            ItemStack stack = inventory.items.get(i);
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.is(ModItems.LIFE_BOTTLE.get()) && !LifeBottleItem.hasSavedInventory(stack)) {
                 bottleSlot = i;
                 bottleStack = stack;
@@ -63,8 +64,8 @@ public final class LifeBottleService {
 
         // Вторая рука (150)
         if (bottleStack.isEmpty()) {
-            for (int i = 0; i < inventory.offhand.size(); i++) {
-                ItemStack stack = inventory.offhand.get(i);
+            for (int i = 0; i < 1; i++) {
+                ItemStack stack = inventory.getItem(40 + i);
                 if (stack.is(ModItems.LIFE_BOTTLE.get()) && !LifeBottleItem.hasSavedInventory(stack)) {
                     bottleSlot = i;
                     bottleStack = stack;
@@ -76,8 +77,8 @@ public final class LifeBottleService {
 
         // Слоты брони (100..103)
         if (bottleStack.isEmpty()) {
-            for (int i = 0; i < inventory.armor.size(); i++) {
-                ItemStack stack = inventory.armor.get(i);
+            for (int i = 0; i < 4; i++) {
+                ItemStack stack = inventory.getItem(36 + i);
                 if (stack.is(ModItems.LIFE_BOTTLE.get()) && !LifeBottleItem.hasSavedInventory(stack)) {
                     bottleSlot = i;
                     bottleStack = stack;
@@ -98,67 +99,55 @@ public final class LifeBottleService {
         filledBottle.setDamageValue(filledBottle.getDamageValue() + 1);
 
         // 3. Сериализуем все 41 слот инвентаря через Data Components
-        ListTag listTag = new ListTag();
+        List<ModDataComponents.SavedSlot> savedSlots = new ArrayList<>();
 
         // Основные слоты (0..35)
-        for (int i = 0; i < inventory.items.size(); i++) {
-            ItemStack stack = inventory.items.get(i);
+        for (int i = 0; i < 36; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) continue;
             if (!isArmor && !isOffhand && i == bottleSlot) {
                 if (stack.getCount() > 1) {
                     ItemStack remaining = stack.copy();
                     remaining.shrink(1);
-                    CompoundTag tag = (CompoundTag) remaining.save(player.registryAccess());
-                    tag.putInt("Slot", i);
-                    listTag.add(tag);
+                    savedSlots.add(new ModDataComponents.SavedSlot(i, remaining));
                 }
             } else {
-                CompoundTag tag = (CompoundTag) stack.save(player.registryAccess());
-                tag.putInt("Slot", i);
-                listTag.add(tag);
+                savedSlots.add(new ModDataComponents.SavedSlot(i, stack.copy()));
             }
         }
 
         // Слоты брони (100..103)
-        for (int i = 0; i < inventory.armor.size(); i++) {
-            ItemStack stack = inventory.armor.get(i);
+        for (int i = 0; i < 4; i++) {
+            ItemStack stack = inventory.getItem(36 + i);
             if (stack.isEmpty()) continue;
             if (isArmor && i == bottleSlot) {
                 if (stack.getCount() > 1) {
                     ItemStack remaining = stack.copy();
                     remaining.shrink(1);
-                    CompoundTag tag = (CompoundTag) remaining.save(player.registryAccess());
-                    tag.putInt("Slot", 100 + i);
-                    listTag.add(tag);
+                    savedSlots.add(new ModDataComponents.SavedSlot(100 + i, remaining));
                 }
             } else {
-                CompoundTag tag = (CompoundTag) stack.save(player.registryAccess());
-                tag.putInt("Slot", 100 + i);
-                listTag.add(tag);
+                savedSlots.add(new ModDataComponents.SavedSlot(100 + i, stack.copy()));
             }
         }
 
         // Вторая рука (150)
-        for (int i = 0; i < inventory.offhand.size(); i++) {
-            ItemStack stack = inventory.offhand.get(i);
+        for (int i = 0; i < 1; i++) {
+            ItemStack stack = inventory.getItem(40 + i);
             if (stack.isEmpty()) continue;
             if (isOffhand && i == bottleSlot) {
                 if (stack.getCount() > 1) {
                     ItemStack remaining = stack.copy();
                     remaining.shrink(1);
-                    CompoundTag tag = (CompoundTag) remaining.save(player.registryAccess());
-                    tag.putInt("Slot", 150 + i);
-                    listTag.add(tag);
+                    savedSlots.add(new ModDataComponents.SavedSlot(150 + i, remaining));
                 }
             } else {
-                CompoundTag tag = (CompoundTag) stack.save(player.registryAccess());
-                tag.putInt("Slot", 150 + i);
-                listTag.add(tag);
+                savedSlots.add(new ModDataComponents.SavedSlot(150 + i, stack.copy()));
             }
         }
 
-        // Сохраняем в Data Components (1.21.1)
-        LifeBottleItem.setSavedInventory(filledBottle, listTag);
+        // Сохраняем в Data Component
+        LifeBottleItem.setSavedInventory(filledBottle, new ModDataComponents.SavedInventory(savedSlots));
 
         // 4. Очищаем инвентарь игрока
         inventory.clearContent();
@@ -166,13 +155,13 @@ public final class LifeBottleService {
         // 5. Проверка защиты от падения в пустоту (Void Protection)
         DamageSource damageSource = player.getLastDamageSource();
         boolean isVoid = (damageSource != null && damageSource.is(DamageTypes.FELL_OUT_OF_WORLD))
-                || player.getY() < player.level().getMinBuildHeight();
+                || player.getY() < player.level().getMinY();
 
         if (isVoid) {
             storeVoidBottle(player.getUUID(), filledBottle);
             MessageUtils.sendInfo(player, "lifexp.message.bottle_void_saved");
         } else {
-            double spawnY = Math.max(player.getY(), player.level().getMinBuildHeight() + 1.0);
+            double spawnY = Math.max(player.getY(), player.level().getMinY() + 1.0);
             ItemEntity entity = new ItemEntity(player.level(), player.getX(), spawnY, player.getZ(), filledBottle);
             entity.setInvulnerable(true);
             entity.setUnlimitedLifetime();

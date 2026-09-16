@@ -3,7 +3,7 @@ package com.hs1n.lifeXp_challenge.service;
 import com.hs1n.lifeXp_challenge.config.AttributeConfigNode;
 import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -114,8 +114,8 @@ public final class AttributeService {
     }
 
     /** ResourceLocation для модификатора конкретного атрибута. */
-    private static ResourceLocation modifierId(String attrKey) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, "xp_scaling_" + attrKey);
+    private static Identifier modifierId(String attrKey) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, "xp_scaling_" + attrKey);
     }
 
     // ── Применение (O(1)) ─────────────────────────────────────────
@@ -159,7 +159,7 @@ public final class AttributeService {
             if (instance == null) continue;
 
             double value        = interpolate(node, level, maxLevel);
-            ResourceLocation id = modifierId(key);
+            Identifier id = modifierId(key);
 
             // Удаляем старый, ставим новый (zero-tick обновление)
             instance.removeModifier(id);

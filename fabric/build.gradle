@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.gradleup.shadow" version "9.0.0"
 }
 
 architectury {
@@ -22,27 +22,20 @@ repositories {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
-    modApi "dev.architectury:architectury-fabric:${rootProject.architectury_version}"
+    implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    api "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    api "dev.architectury:architectury-fabric:${rootProject.architectury_version}"
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    common(project(path: ":common")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
-    modImplementation "dev.isxander:yet-another-config-lib:3.6.1+1.21-fabric"
-    modImplementation "com.terraformersmc:modmenu:11.0.3"
-    modLocalRuntime "mezz.jei:jei-1.21.1-fabric:19.21.0.246"
+    implementation "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-fabric"
+    implementation "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+    runtimeOnly "mezz.jei:jei-26.2-fabric:${rootProject.jei_version}"
 }
 
 shadowJar {
     configurations = [project.configurations.shadowCommon]
-    archiveClassifier.set("dev-shadow")
-}
-
-remapJar {
-    injectAccessWidener = true
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
     archiveClassifier.set("fabric")
 }
 

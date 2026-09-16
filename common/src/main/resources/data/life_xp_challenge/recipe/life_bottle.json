@@ -7,10 +7,10 @@
     " B "
   ],
   "key": {
-    "T": { "item": "minecraft:totem_of_undying" },
-    "E": { "item": "minecraft:ender_eye" },
-    "C": { "item": "minecraft:chest" },
-    "B": { "item": "minecraft:glass_bottle" }
+    "T": "minecraft:totem_of_undying",
+    "E": "minecraft:ender_eye",
+    "C": "minecraft:chest",
+    "B": "minecraft:glass_bottle"
   },
   "result": {
     "count": 1,

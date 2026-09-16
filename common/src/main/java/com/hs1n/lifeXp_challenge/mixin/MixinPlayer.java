@@ -5,7 +5,7 @@ import com.hs1n.lifeXp_challenge.service.LifeBottleService;
 import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +33,7 @@ public abstract class MixinPlayer {
     @Inject(method = "getBaseExperienceReward", at = @At("HEAD"), cancellable = true)
     private void lifeXp$getBaseExperienceReward(CallbackInfoReturnable<Integer> cir) {
         Player player = (Player) (Object) this;
-        if (!player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator()) {
+        if (player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel && !serverLevel.getGameRules().get(GameRules.KEEP_INVENTORY) && !player.isSpectator()) {
             double tax = LifeXpConfig.INSTANCE.getDeathXpTax();
             if (player instanceof ServerPlayer serverPlayer) {
                 tax = com.hs1n.lifeXp_challenge.service.DeathTaxService.calculateSmartTax(serverPlayer);

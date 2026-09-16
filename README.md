@@ -3,8 +3,8 @@
 # 🌟 LIFE-XP Challenge
 
 [![Mod Loaders](https://img.shields.io/badge/Mod%20Loaders-Fabric%20%7C%20NeoForge-orange?logo=minecraft&logoColor=white)](https://modrinth.com)
-[![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.1-green?logo=minecraft&logoColor=white)](https://minecraft.net)
-[![Mod Version](https://img.shields.io/badge/Version-1.5.2-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
+[![Minecraft Version](https://img.shields.io/badge/Minecraft-26.1.1-green?logo=minecraft&logoColor=white)](https://minecraft.net)
+[![Mod Version](https://img.shields.io/badge/Version-1.6.0-blue?logo=semver&logoColor=white)](https://github.com/Heysh1n/life-xp/releases)
 [![Wiki](https://img.shields.io/badge/Documentation-GitHub%20Wiki-purple?logo=gitbook&logoColor=white)](https://github.com/Heysh1n/life-xp/wiki)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -16,7 +16,7 @@
 
 ## 📖 What is LIFE-XP Challenge?
 
-**LIFE-XP Challenge** is a hardcore progression and survival overhaul mod for **Minecraft 1.21.1**, developed on a unified **Architectury** monorepo supporting both **Fabric** and **NeoForge** with 100% feature parity.
+**LIFE-XP Challenge** is a hardcore progression and survival overhaul mod for **Minecraft 26.1.1**, developed on a unified **Architectury** monorepo supporting both **Fabric** and **NeoForge** with 100% feature parity.
 
 In vanilla Minecraft, experience levels are trivial—used merely for enchanting or anvil repairs, and mostly forgotten after reaching level 30. **LIFE-XP binds your entire physical existence to your XP bar:**
 
@@ -46,13 +46,13 @@ In vanilla Minecraft, experience levels are trivial—used merely for enchanting
 
 ### System Requirements
 
-* **Minecraft:** `1.21.1`
-* **Java:** `21+`
+* **Minecraft:** `26.1.1`
+* **Java:** `25+`
 * **Mod Loaders:** `Fabric Loader` or `NeoForge`
 
 ### Fabric Installation
 
-1. Install [Fabric Loader 1.21.1](https://fabricmc.net/).
+1. Install [Fabric Loader 26.1.1](https://fabricmc.net/).
 2. Place required dependencies into your `.minecraft/mods/` folder:
 * [Architectury API (Fabric)](https://modrinth.com/mod/architectury-api)
 * [Fabric API](https://modrinth.com/mod/fabric-api)
@@ -60,17 +60,17 @@ In vanilla Minecraft, experience levels are trivial—used merely for enchanting
 * *(Optional but Recommended)* [JEI](https://modrinth.com/mod/jei) or [EMI](https://modrinth.com/mod/emi)
 
 
-3. Drop `life_xp_challenge-1.5.0-fabric.jar` into `mods/`.
+3. Drop `life_xp_challenge-1.6.1-fabric.jar` into `mods/`.
 
 ### NeoForge Installation
 
-1. Install [NeoForge 1.21.1](https://neoforged.net/) (`21.1.77+`).
+1. Install [NeoForge 26.1.1](https://neoforged.net/).
 2. Place required dependencies into your `.minecraft/mods/` folder:
 * [Architectury API (NeoForge)](https://modrinth.com/mod/architectury-api)
 * [YetAnotherConfigLib (YACL) v3](https://modrinth.com/mod/yacl)
 
 
-3. Drop `life_xp_challenge-1.5.0-neoforge.jar` into `mods/`.
+3. Drop `life_xp_challenge-1.6.1-neoforge.jar` into `mods/`.
 
 ## 🧬 Core Progression & Mechanics
 
@@ -129,11 +129,6 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
   <img src=".github/assets/crafts/shield_core.png" alt="Shield Core Recipe" onerror="this.style.display='none'"/>
 </p>
 
-```text
-[  Echo Shard  ] [ Amethyst Shard ] [  Ender Eye   ]
-[Amethyst Shard] [ Dynamic XP Bt. ] [Amethyst Shard]
-[  Blaze Rod   ] [ Amethyst Shard ] [  Blaze Rod   ]
-```
 
 ### 2. Life Bottle (`life_bottle`)
 
@@ -146,12 +141,6 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
   <img src=".github/assets/crafts/life_bottle.png" alt="Life Bottle Recipe" onerror="this.style.display='none'"/>
 </p>
 
-```text
-[ Gold Ingot ] [ Amethyst Shard ] [ Gold Ingot ]
-[   Glass    ] [Totem of Undying] [   Glass    ]
-[  Obsidian  ] [  Ender Chest   ] [  Obsidian  ]
-```
-
 ### 3. Dynamic XP Bottle (`dynamic_xp_bottle`)
 
 * Hold **Shift + Right-Click** to siphon player XP into the bottle (10% storage tax).
@@ -159,14 +148,9 @@ The legacy text box and restrictive fog have been replaced with a seamless, imme
 
 <!-- Craft visual: place craft image or demo gif in .github/assets/crafts/dynamic_xp_bottle.png or .github/assets/gifs/dynamic_xp_bottle.gif -->
 <p align="center">
-  <img src=".github/assets/crafts/dynamic_xp_bottle.png" alt="Dynamic XP Bottle Recipe" onerror="this.style.display='none'"/>
+  <img src=".github/assets/gifs/dynamic_xp_bottle.gif" alt="Dynamic XP Bottle Recipe" onerror="this.style.display='none'"/>
 </p>
 
-```text
-[ Amethyst Shard ] [  Lapis Lazuli  ] [ Amethyst Shard ]
-[  Lapis Lazuli  ] [Bottle o' Ench. ] [  Lapis Lazuli  ]
-[  Redstone Dust ] [  Glass Bottle  ] [  Redstone Dust ]
-```
 
 ---
 
@@ -214,7 +198,7 @@ For exhaustive technical documentation, developer internals, mixin injection pip
 
 ## 📜 License
 
-[MIT](https://www.google.com/search?q=LICENSE) — © 2026 [Heysh1n](https://github.com/Heysh1n)
+[MIT](https://www.google.com/search?q=MIT_LICENSE) — © 2026 [Heysh1n](https://github.com/Heysh1n)
 
 <p align="center">
 Made with ❤️ by Heysh1n

@@ -9,8 +9,9 @@ repositories {
 }
 
 dependencies {
-    modImplementation "dev.architectury:architectury:${rootProject.architectury_version}"
-    modCompileOnly "dev.isxander:yet-another-config-lib:3.6.1+1.21-fabric"
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.21.0.246"
-    compileOnly "dev.emi:emi-xplat-mojmap:1.1.24+1.21.1:api"
+    implementation "dev.architectury:architectury:${rootProject.architectury_version}"
+    compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-fabric"
+    compileOnly "mezz.jei:jei-26.2-common-api:${rootProject.jei_version}"
+    // EMI не имеет релиза под Minecraft 26.2 (последняя версия 1.1.24+1.21.1)
+    // compileOnly "dev.emi:emi-xplat-mojmap:${rootProject.emi_version}:api"
 }

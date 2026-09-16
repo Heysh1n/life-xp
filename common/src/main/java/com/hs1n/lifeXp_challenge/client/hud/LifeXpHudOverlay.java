@@ -4,7 +4,7 @@ import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import com.hs1n.lifeXp_challenge.service.KillStreakService;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,9 +16,9 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public class LifeXpHudOverlay {
 
-    public static void render(GuiGraphics graphics, DeltaTracker delta) {
+    public static void render(GuiGraphicsExtractor graphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.options.hideGui || mc.gui.getDebugOverlay().showDebugScreen()) {
+        if (mc.player == null || mc.gui.hud.isHidden() || mc.getDebugOverlay().showDebugScreen()) {
             return;
         }
 
@@ -74,7 +74,7 @@ public class LifeXpHudOverlay {
         if (streak > 0) {
             String streakText = "🔥 " + streak + " (+" + streak + "%)";
             int textX = (screenWidth / 2 + 90) - mc.font.width(streakText);
-            graphics.drawString(mc.font, streakText, textX, y - 10, 0xFFFF6600, true);
+            graphics.text(mc.font, streakText, textX, y - 10, 0xFFFF6600, true);
         }
     }
 
@@ -85,7 +85,7 @@ public class LifeXpHudOverlay {
      * - 0.50f <= progress < 1.00f: аквамариновый
      * - progress >= 1.00f: золотой
      */
-    private static void renderOrb(GuiGraphics graphics, int x, int y, boolean filled, float progress) {
+    private static void renderOrb(GuiGraphicsExtractor graphics, int x, int y, boolean filled, float progress) {
         if (!filled) {
             // Тёмный контур пустой сферы (8x8)
             graphics.fill(x + 2, y,     x + 6, y + 1, 0xFF141414);

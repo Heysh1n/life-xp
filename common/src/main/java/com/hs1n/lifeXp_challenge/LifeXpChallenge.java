@@ -23,9 +23,14 @@ public class LifeXpChallenge {
         LifeXpConfig.load();
         
         ModItems.ITEMS.register();
+        com.hs1n.lifeXp_challenge.registry.ModDataComponents.init();
         com.hs1n.lifeXp_challenge.registry.ModMobEffects.init();
         com.hs1n.lifeXp_challenge.registry.ModPotions.init();
+        com.hs1n.lifeXp_challenge.registry.ModLootRegistries.init();
         ModCreativeTabs.CREATIVE_MODE_TABS.register();
+
+        com.hs1n.lifeXp_challenge.service.XpHarvesterService.init();
+        com.hs1n.lifeXp_challenge.service.FishingLootService.init();
 
         com.hs1n.lifeXp_challenge.network.LifeXpNetworking.registerServerReceiver();
 
@@ -35,7 +40,7 @@ public class LifeXpChallenge {
 
         PlayerEvent.PLAYER_JOIN.register(player -> {
             AttributeService.recalculate(player);
-            if (!player.getTags().contains(LifeXpCommand.PRESET_TAG)) {
+            if (!player.entityTags().contains(LifeXpCommand.PRESET_TAG)) {
                 com.hs1n.lifeXp_challenge.network.LifeXpNetworking.sendOpenPresetScreen(player);
             }
         });

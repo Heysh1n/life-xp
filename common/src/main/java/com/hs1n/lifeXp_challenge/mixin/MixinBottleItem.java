@@ -3,7 +3,7 @@ package com.hs1n.lifeXp_challenge.mixin;
 import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
 import com.hs1n.lifeXp_challenge.util.MessageUtils;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BottleItem;
 import net.minecraft.world.item.ItemStack;
@@ -21,16 +21,16 @@ public abstract class MixinBottleItem {
 
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void lifeXp$onUse(Level level, Player player, InteractionHand hand,
-                              CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
+                              CallbackInfoReturnable<InteractionResult> cir) {
         if (player.isShiftKeyDown()) {
             if (ExperienceUtils.getPlayerTotalXp(player) > 0) {
                 player.startUsingItem(hand);
-                cir.setReturnValue(InteractionResultHolder.consume(player.getItemInHand(hand)));
+                cir.setReturnValue(InteractionResult.CONSUME);
             } else {
                 if (level.isClientSide()) {
                     MessageUtils.sendActionBarError(player, "lifexp.message.not_enough_xp");
                 }
-                cir.setReturnValue(InteractionResultHolder.fail(player.getItemInHand(hand)));
+                cir.setReturnValue(InteractionResult.FAIL);
             }
         }
     }

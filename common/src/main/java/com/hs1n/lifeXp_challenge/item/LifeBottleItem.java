@@ -1,75 +1,56 @@
 package com.hs1n.lifeXp_challenge.item;
 
+import com.hs1n.lifeXp_challenge.registry.ModDataComponents;
+import com.hs1n.lifeXp_challenge.registry.ModDataComponents.SavedInventory;
+import com.hs1n.lifeXp_challenge.registry.ModDataComponents.SavedSlot;
 import com.hs1n.lifeXp_challenge.util.MessageUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Пузырёк жизни с прочностью 3.
- * При гибели сохраняет инвентарь игрока через Data Components (1.21.1).
+ * При гибели сохраняет инвентарь игрока через Data Components.
  * При Shift + ПКМ проверяет наличие свободного места в инвентаре и возвращает сохранённые вещи.
  */
 public class LifeBottleItem extends Item {
 
-    public static final String NBT_SAVED_INVENTORY = "SavedInventory";
-
     public LifeBottleItem(Item.Properties properties) {
-        // Добавляем флаг скрытия дополнительных ванильных тултипов (включая ванильную прочность)
-        super(properties.component(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE));
+        super(properties);
     }
 
     public static boolean hasSavedInventory(ItemStack stack) {
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        return customData != null && customData.contains(NBT_SAVED_INVENTORY);
+        SavedInventory inv = stack.get(ModDataComponents.SAVED_INVENTORY.get());
+        return inv != null && !inv.isEmpty();
     }
 
-    public static ListTag getSavedInventory(ItemStack stack) {
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        if (customData == null) return null;
-        CompoundTag tag = customData.copyTag();
-        return tag.getList(NBT_SAVED_INVENTORY, Tag.TAG_COMPOUND);
+    public static SavedInventory getSavedInventory(ItemStack stack) {
+        return stack.getOrDefault(ModDataComponents.SAVED_INVENTORY.get(), SavedInventory.EMPTY);
     }
 
-    public static void setSavedInventory(ItemStack stack, ListTag listTag) {
-        CompoundTag tag = new CompoundTag();
-        CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
-        if (existing != null) {
-            tag = existing.copyTag();
+    public static void setSavedInventory(ItemStack stack, SavedInventory inventory) {
+        if (inventory == null || inventory.isEmpty()) {
+            clearSavedInventory(stack);
+        } else {
+            stack.set(ModDataComponents.SAVED_INVENTORY.get(), inventory);
         }
-        tag.put(NBT_SAVED_INVENTORY, listTag);
-        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
     public static void clearSavedInventory(ItemStack stack) {
-        CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
-        if (existing != null) {
-            CompoundTag tag = existing.copyTag();
-            tag.remove(NBT_SAVED_INVENTORY);
-            if (tag.isEmpty()) {
-                stack.remove(DataComponents.CUSTOM_DATA);
-            } else {
-                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-            }
-        }
+        stack.remove(ModDataComponents.SAVED_INVENTORY.get());
     }
 
     /**
@@ -77,26 +58,26 @@ public class LifeBottleItem extends Item {
      */
     public static int getEmptySlotCount(Inventory inventory) {
         int count = 0;
-        for (ItemStack item : inventory.items) {
+        for (ItemStack item : inventory.getNonEquipmentItems()) {
             if (item.isEmpty()) count++;
         }
-        for (ItemStack armor : inventory.armor) {
-            if (armor.isEmpty()) count++;
+        for (int i = 0; i < 4; i++) {
+            if (inventory.getItem(36 + i).isEmpty()) count++;
         }
-        for (ItemStack offhand : inventory.offhand) {
-            if (offhand.isEmpty()) count++;
+        for (int i = 0; i < 1; i++) {
+            if (inventory.getItem(40 + i).isEmpty()) count++;
         }
         return count;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        
+
         if (hasSavedInventory(stack)) {
             if (player.isShiftKeyDown()) {
-                ListTag listTag = getSavedInventory(stack);
-                int savedCount = (listTag != null) ? listTag.size() : 0;
+                SavedInventory savedInv = getSavedInventory(stack);
+                int savedCount = savedInv.size();
 
                 // 1. Точно считаем пустые слоты во всем инвентаре
                 int freeSlots = getEmptySlotCount(player.getInventory());
@@ -107,51 +88,50 @@ public class LifeBottleItem extends Item {
                         // Жестко отменяем и выводим красное сообщение
                         MessageUtils.sendActionBarError(player, "lifexp.message.not_enough_space");
                     }
-                    return InteractionResultHolder.fail(stack);
+                    return InteractionResult.FAIL;
                 }
 
                 // 3. Только если места 100% хватает, выполняем распаковку
                 if (!level.isClientSide()) {
-                    unpackInventory(level, player, stack, listTag);
+                    unpackInventory(level, player, stack, savedInv);
                 }
-                
-                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+
+                return InteractionResult.SUCCESS;
             }
         }
-        return InteractionResultHolder.pass(stack);
+        return InteractionResult.PASS;
     }
 
-    private void unpackInventory(Level level, Player player, ItemStack stack, ListTag listTag) {
-        if (listTag == null || listTag.isEmpty()) return;
+    private void unpackInventory(Level level, Player player, ItemStack stack, SavedInventory savedInv) {
+        if (savedInv.isEmpty()) return;
 
-        // Очищаем NBT с инвентарем перед выдачей вещей
+        // Очищаем компонент с инвентарем перед выдачей вещей
         clearSavedInventory(stack);
 
         Inventory inventory = player.getInventory();
         int restoredCount = 0;
 
-        for (int i = 0; i < listTag.size(); i++) {
-            CompoundTag itemTag = listTag.getCompound(i);
-            int slot = itemTag.getInt("Slot");
-            ItemStack item = ItemStack.parseOptional(player.registryAccess(), itemTag);
-            
+        for (SavedSlot savedSlot : savedInv.slots()) {
+            int slot = savedSlot.slot();
+            ItemStack item = savedSlot.stack().copy();
+
             if (!item.isEmpty()) {
                 restoredCount++;
                 boolean placed = false;
-                
+
                 // Шаг 1: Пытаемся вернуть предмет в его родной слот
-                if (slot >= 0 && slot < inventory.items.size() && inventory.items.get(slot).isEmpty()) {
-                    inventory.items.set(slot, item);
+                if (slot >= 0 && slot < 36 && inventory.getItem(slot).isEmpty()) {
+                    inventory.setItem(slot, item);
                     placed = true;
-                } else if (slot >= 100 && slot < 100 + inventory.armor.size() && inventory.armor.get(slot - 100).isEmpty()) {
-                    inventory.armor.set(slot - 100, item);
+                } else if (slot >= 100 && slot < 100 + 4 && inventory.getItem(36 + slot - 100).isEmpty()) {
+                    inventory.setItem(36 + slot - 100, item);
                     placed = true;
-                } else if (slot >= 150 && slot < 150 + inventory.offhand.size() && inventory.offhand.get(slot - 150).isEmpty()) {
-                    inventory.offhand.set(slot - 150, item);
+                } else if (slot >= 150 && slot < 150 + 1 && inventory.getItem(40 + slot - 150).isEmpty()) {
+                    inventory.setItem(40 + slot - 150, item);
                     placed = true;
                 }
 
-                // Шаг 2: Если родной слот занят, пробуем обычный add (занимает слоты основного инвентаря)
+                // Шаг 2: Если родной слот занят, пробуем обычный add
                 if (!placed) {
                     if (inventory.add(item)) {
                         placed = true;
@@ -159,27 +139,26 @@ public class LifeBottleItem extends Item {
                 }
 
                 // Шаг 3: Если основной инвентарь переполнен, но есть пустые слоты брони/оффхенда
-                // (ведь мы считали их как свободные при проверке freeSlots >= savedCount)
                 if (!placed) {
-                    for (int j = 0; j < inventory.armor.size(); j++) {
-                        if (inventory.armor.get(j).isEmpty()) {
-                            inventory.armor.set(j, item);
+                    for (int j = 0; j < 4; j++) {
+                        if (inventory.getItem(36 + j).isEmpty()) {
+                            inventory.setItem(36 + j, item);
                             placed = true;
                             break;
                         }
                     }
                 }
                 if (!placed) {
-                    for (int j = 0; j < inventory.offhand.size(); j++) {
-                        if (inventory.offhand.get(j).isEmpty()) {
-                            inventory.offhand.set(j, item);
+                    for (int j = 0; j < 1; j++) {
+                        if (inventory.getItem(40 + j).isEmpty()) {
+                            inventory.setItem(40 + j, item);
                             placed = true;
                             break;
                         }
                     }
                 }
 
-                // Шаг 4: Экстренный сброс на землю (теоретически никогда не сработает из-за жесткой проверки)
+                // Шаг 4: Экстренный сброс на землю
                 if (!placed) {
                     player.drop(item, false);
                 }
@@ -208,35 +187,37 @@ public class LifeBottleItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public boolean isBarVisible(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
         int usesLeft = Math.max(0, stack.getMaxDamage() - stack.getDamageValue());
+        
+        ChatFormatting durabilityColor = ChatFormatting.GREEN;
+        float ratio = (float) usesLeft / stack.getMaxDamage();
+        if (ratio <= 0.25f) {
+            durabilityColor = ChatFormatting.RED;
+        } else if (ratio <= 0.5f) {
+            durabilityColor = ChatFormatting.YELLOW;
+        }
 
         if (hasSavedInventory(stack)) {
-            ListTag listTag = getSavedInventory(stack);
-            int itemCount = listTag != null ? listTag.size() : 0;
-            tooltip.add(Component.translatable("lifexp.life_bottle.contains_items", itemCount)
+            int itemCount = getSavedInventory(stack).size();
+            tooltip.accept(Component.translatable("lifexp.life_bottle.contains_items", itemCount)
                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         }
 
-        if (Screen.hasShiftDown()) {
-            tooltip.add(Component.translatable("item.life_xp_challenge.life_bottle.desc")
+        if (Minecraft.getInstance().hasShiftDown()) {
+            tooltip.accept(Component.translatable("item.life_xp_challenge.life_bottle.desc")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
-            tooltip.add(Component.translatable("lifexp.tooltip.hold_shift")
+            tooltip.accept(Component.translatable("lifexp.tooltip.hold_shift")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
 
-        // Цветокоррекция (светофор) для одной кастомной строки прочности
-        ChatFormatting durabilityColor;
-        if (usesLeft >= 3) {
-            durabilityColor = ChatFormatting.GREEN;
-        } else if (usesLeft == 2) {
-            durabilityColor = ChatFormatting.GOLD;
-        } else {
-            durabilityColor = ChatFormatting.RED;
-        }
-
-        tooltip.add(Component.translatable("lifexp.life_bottle.durability", usesLeft, stack.getMaxDamage())
+        tooltip.accept(Component.translatable("lifexp.life_bottle.durability", usesLeft, stack.getMaxDamage())
                 .withStyle(durabilityColor));
     }
 }

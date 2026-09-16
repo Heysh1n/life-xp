@@ -1,7 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/potion_overlay",
-    "layer1": "minecraft:item/experience_bottle"
+    "layer0": "life_xp_challenge:item/dynamic_xp_bottle"
   }
 }

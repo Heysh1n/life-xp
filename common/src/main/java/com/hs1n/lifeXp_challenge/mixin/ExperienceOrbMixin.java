@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,9 +19,10 @@ import java.util.List;
 @Mixin(ExperienceOrb.class)
 public abstract class ExperienceOrbMixin {
 
-    @Shadow private int value;
     @Shadow private int count;
     @Shadow public abstract int getValue();
+    @Invoker("setValue")
+    protected abstract void lifeXp$invokeSetValue(int value);
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;DDDI)V", at = @At("RETURN"))
     private void lifeXp$onOrbConstructed(Level level, double x, double y, double z, int value, CallbackInfo ci) {
@@ -36,7 +38,7 @@ public abstract class ExperienceOrbMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void lifeXp$clumpNearbyOrbs(CallbackInfo ci) {
         ExperienceOrb self = (ExperienceOrb) (Object) this;
-        if (self.level().isClientSide || !self.isAlive() || self.isRemoved()) return;
+        if (self.level().isClientSide() || !self.isAlive() || self.isRemoved()) return;
         if (self.tickCount % 5 != 0) return;
 
         AABB aabb = self.getBoundingBox().inflate(2.0);
@@ -47,12 +49,12 @@ public abstract class ExperienceOrbMixin {
 
         for (ExperienceOrb other : nearby) {
             ExperienceOrbAccessor otherAccessor = (ExperienceOrbAccessor) other;
-            this.value += other.getValue() * Math.max(1, otherAccessor.lifeXp$getCount());
+            this.lifeXp$invokeSetValue(this.getValue() + other.getValue() * Math.max(1, otherAccessor.lifeXp$getCount()));
             this.count = 1;
-            if (other.getTags().contains("life_xp_ore")) {
+            if (other.entityTags().contains("life_xp_ore")) {
                 self.addTag("life_xp_ore");
             }
-            if (other.getTags().contains("life_xp_fishing")) {
+            if (other.entityTags().contains("life_xp_fishing")) {
                 self.addTag("life_xp_fishing");
             }
             other.discard();
@@ -63,9 +65,9 @@ public abstract class ExperienceOrbMixin {
     private void lifeXp$onPlayerTouchOrb(Player player, CallbackInfo ci) {
         if (player instanceof ServerPlayer serverPlayer) {
             ExperienceOrb orb = (ExperienceOrb) (Object) this;
-            if (orb.getTags().contains("life_xp_ore")) {
+            if (orb.entityTags().contains("life_xp_ore")) {
                 AdvancementService.addOreXp(serverPlayer, this.getValue());
-            } else if (orb.getTags().contains("life_xp_fishing")) {
+            } else if (orb.entityTags().contains("life_xp_fishing")) {
                 AdvancementService.addFishingXp(serverPlayer, this.getValue());
             }
         }

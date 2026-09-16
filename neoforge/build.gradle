@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.gradleup.shadow" version "9.0.0"
 }
 
 architectury {
@@ -18,31 +18,27 @@ configurations {
 repositories {
     maven { url "https://maven.neoforged.net/releases/" }
     maven { url "https://maven.isxander.dev/releases" }
+    maven { url "https://maven.blamejared.com/" }
     maven { url "https://thedarkcolour.github.io/KotlinForForge/" }
 }
 
 dependencies {
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
-    modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
+    api "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    common(project(path: ":common")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
 
-//    modImplementation "dev.isxander:yet-another-config-lib:3.6.1+1.21-neoforge"
-//    modImplementation "dev.isxander:yet-another-config-lib:3.6.1+1.21-neoforge"
-    forgeRuntimeLibrary "org.quiltmc.parsers:json:0.2.1"
+    compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+    runtimeOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+    runtimeOnly "mezz.jei:jei-26.2-neoforge:${rootProject.jei_version}"
 
-    forgeRuntimeLibrary "org.quiltmc.parsers:gson:0.2.1"
+    runtimeOnly "org.quiltmc.parsers:json:0.2.1"
+    runtimeOnly "org.quiltmc.parsers:gson:0.2.1"
 }
 
 shadowJar {
     configurations = [project.configurations.shadowCommon]
-    archiveClassifier.set("dev-shadow")
-}
-
-remapJar {
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
     archiveClassifier.set("neoforge")
 }
 

@@ -1,7 +1,36 @@
-plugins {
-    id "architectury-plugin" version "3.4.164"
-    id "dev.architectury.loom" version "1.7.435" apply false
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url = "https://maven.architectury.dev/" }
+        maven { url = "https://maven.fabricmc.net/" }
+        maven { url = "https://maven.neoforged.net/releases/" }
+    }
+    dependencies {
+        // Правильные пути к плагинам
+        classpath "architectury-plugin:architectury-plugin.gradle.plugin:${rootProject.architectury_plugin_version}"
+        classpath "dev.architectury.loom:dev.architectury.loom.gradle.plugin:${rootProject.architectury_loom_version}"
+
+        // Форс ASM оставляй как есть
+        classpath "org.ow2.asm:asm:9.8"
+        classpath "org.ow2.asm:asm-commons:9.8"
+        classpath "org.ow2.asm:asm-tree:9.8"
+        classpath "org.ow2.asm:asm-analysis:9.8"
+        classpath "org.ow2.asm:asm-util:9.8"
+    }
+    configurations.classpath {
+        resolutionStrategy {
+            force "org.ow2.asm:asm:9.8",
+                    "org.ow2.asm:asm-commons:9.8",
+                    "org.ow2.asm:asm-tree:9.8",
+                    "org.ow2.asm:asm-analysis:9.8",
+                    "org.ow2.asm:asm-util:9.8"
+        }
+    }
 }
+
+// Применяем плагин глобально старым надежным способом
+apply plugin: "architectury-plugin"
 
 architectury {
     minecraft = rootProject.minecraft_version
@@ -19,25 +48,28 @@ allprojects {
     version = rootProject.mod_version
     group = rootProject.maven_group
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = "UTF-8"
-        options.release = 21
+        options.release = 25
     }
 
     java {
         withSourcesJar()
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
     }
 }
 
 subprojects {
-    apply plugin: "dev.architectury.loom"
+    apply plugin: "dev.architectury.loom-no-remap"
 
     loom {
         silentMojangMappingsLicense()
+        enableTransitiveAccessWideners = false
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings loom.officialMojangMappings()
     }
 }

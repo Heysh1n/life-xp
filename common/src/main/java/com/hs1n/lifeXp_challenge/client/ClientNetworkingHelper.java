@@ -8,6 +8,6 @@ public final class ClientNetworkingHelper {
 
     public static void openPresetScreen() {
         Minecraft mc = Minecraft.getInstance();
-        mc.setScreen(new PresetSelectionScreen());
+        mc.setScreenAndShow(new PresetSelectionScreen());
     }
 }
