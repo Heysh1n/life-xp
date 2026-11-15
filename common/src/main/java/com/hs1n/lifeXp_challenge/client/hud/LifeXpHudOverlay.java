@@ -4,7 +4,11 @@ import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import com.hs1n.lifeXp_challenge.service.KillStreakService;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+//? if >= 26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import net.minecraft.client.gui.GuiGraphics;*/
+//?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,11 +20,29 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public class LifeXpHudOverlay {
 
+//? if >= 26.2 {
+    private static boolean isHudHidden(Minecraft mc) {
+        return mc.player == null || mc.gui.hud.isHidden() || mc.getDebugOverlay().showDebugScreen();
+    }
+//?} else {
+  /*private static boolean isHudHidden(Minecraft mc) {
+        return mc.player == null || mc.getDebugOverlay().showDebugScreen();
+    }*/
+//?}
+
+//? if >= 26.1 {
     public static void render(GuiGraphicsExtractor graphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.gui.hud.isHidden() || mc.getDebugOverlay().showDebugScreen()) {
+        if (isHudHidden(mc)) {
             return;
         }
+//?} else {
+  /*public static void render(GuiGraphics graphics, DeltaTracker delta) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.options.hideGui || mc.gui.getDebugOverlay().showDebugScreen()) {
+            return;
+        }*/
+//?}
 
         LocalPlayer player = mc.player;
         if (player.isSpectator() || player.isCreative()) {
@@ -74,7 +96,11 @@ public class LifeXpHudOverlay {
         if (streak > 0) {
             String streakText = "🔥 " + streak + " (+" + streak + "%)";
             int textX = (screenWidth / 2 + 90) - mc.font.width(streakText);
+//? if >= 26.1 {
             graphics.text(mc.font, streakText, textX, y - 10, 0xFFFF6600, true);
+//?} else {
+          /*graphics.drawString(mc.font, streakText, textX, y - 10, 0xFFFF6600, true);*/
+//?}
         }
     }
 
@@ -85,7 +111,11 @@ public class LifeXpHudOverlay {
      * - 0.50f <= progress < 1.00f: аквамариновый
      * - progress >= 1.00f: золотой
      */
+//? if >= 26.1 {
     private static void renderOrb(GuiGraphicsExtractor graphics, int x, int y, boolean filled, float progress) {
+//?} else {
+  /*private static void renderOrb(GuiGraphics graphics, int x, int y, boolean filled, float progress) {*/
+//?}
         if (!filled) {
             // Тёмный контур пустой сферы (8x8)
             graphics.fill(x + 2, y,     x + 6, y + 1, 0xFF141414);

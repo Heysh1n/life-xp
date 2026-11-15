@@ -3,7 +3,11 @@ package com.hs1n.lifeXp_challenge.mixin;
 import com.hs1n.lifeXp_challenge.util.ExperienceSourceHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -21,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BlockExperienceMixin {
 
     @Unique
+//? if >= 26.1 {
     private static final TagKey<Block> COMMON_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores"));
     @Unique
     private static final TagKey<Block> COAL_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "coal_ores"));
@@ -32,6 +37,19 @@ public abstract class BlockExperienceMixin {
     private static final TagKey<Block> LAPIS_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "lapis_ores"));
     @Unique
     private static final TagKey<Block> REDSTONE_ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "redstone_ores"));
+//?} else {
+  /*private static final TagKey<Block> COMMON_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
+    @Unique
+    private static final TagKey<Block> COAL_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "coal_ores"));
+    @Unique
+    private static final TagKey<Block> DIAMOND_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    @Unique
+    private static final TagKey<Block> EMERALD_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "emerald_ores"));
+    @Unique
+    private static final TagKey<Block> LAPIS_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    @Unique
+    private static final TagKey<Block> REDSTONE_ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_ores"));*/
+//?}
 
     @Unique
     private static boolean lifeXp$isOre(BlockState state) {

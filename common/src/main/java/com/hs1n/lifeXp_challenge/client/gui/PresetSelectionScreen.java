@@ -2,7 +2,11 @@ package com.hs1n.lifeXp_challenge.client.gui;
 
 import com.hs1n.lifeXp_challenge.network.LifeXpNetworking;
 import net.minecraft.ChatFormatting;
+//? if >= 26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import net.minecraft.client.gui.GuiGraphics;*/
+//?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -149,6 +153,7 @@ public class PresetSelectionScreen extends Screen {
         return false;
     }
 
+//? if >= 26.1 {
     @Override
     public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         // 1. Semi-transparent dark background gradient
@@ -196,4 +201,50 @@ public class PresetSelectionScreen extends Screen {
         // 6. Render widgets (buttons) on top of the card
         super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
+//?} else {
+  /*@Override
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.fillGradient(0, 0, this.width, this.height, COLOR_BG_GRADIENT_TOP, COLOR_BG_GRADIENT_BOTTOM);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        int cardX = (this.width - CARD_WIDTH) / 2;
+        int cardY = (this.height - CARD_HEIGHT) / 2 + 10;
+
+        // Card body
+        guiGraphics.fill(cardX, cardY, cardX + CARD_WIDTH, cardY + CARD_HEIGHT, COLOR_CARD_BG);
+        guiGraphics.renderOutline(cardX, cardY, CARD_WIDTH, CARD_HEIGHT, COLOR_CARD_BORDER);
+
+        // Titles
+        guiGraphics.drawCenteredString(this.font, Component.translatable("lifexp.gui.preset.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), this.width / 2, cardY - 24, COLOR_TITLE);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("lifexp.gui.preset.subtitle").withStyle(ChatFormatting.GRAY), this.width / 2, cardY - 12, COLOR_SUBTITLE);
+
+        if (!presets.isEmpty()) {
+            PresetCard current = presets.get(currentIndex);
+
+            // Card Header: Preset Title
+            guiGraphics.drawCenteredString(this.font, current.title(), this.width / 2, cardY + 12, current.accentColor());
+
+            // Badge
+            guiGraphics.drawCenteredString(this.font, current.badge(), this.width / 2, cardY + 26, COLOR_BADGE);
+
+            // Separator line
+            guiGraphics.fill(cardX + 16, cardY + 38, cardX + CARD_WIDTH - 16, cardY + 39, COLOR_SEPARATOR);
+
+            // Description
+            guiGraphics.drawWordWrap(this.font, current.description(), cardX + 20, cardY + 46, CARD_WIDTH - 40, COLOR_DESCRIPTION);
+
+            // Modifiers / Stats section
+            guiGraphics.drawString(this.font, Component.translatable("lifexp.gui.preset.modifiers_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE), cardX + 20, cardY + 86, COLOR_MODIFIERS_HEADER);
+            guiGraphics.drawWordWrap(this.font, current.stats(), cardX + 20, cardY + 100, CARD_WIDTH - 40, COLOR_STATS);
+
+            // Page indicator (e.g. 1 / 6)
+            String pageStr = (currentIndex + 1) + " / " + presets.size();
+            guiGraphics.drawCenteredString(this.font, Component.literal(pageStr).withStyle(ChatFormatting.GRAY), this.width / 2, cardY + CARD_HEIGHT - 44, COLOR_PAGE_INDICATOR);
+        }
+    }*/
+//?}
 }

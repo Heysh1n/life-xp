@@ -31,6 +31,98 @@ buildscript {
 
 // Применяем плагин глобально старым надежным способом
 apply plugin: "architectury-plugin"
+apply from: rootProject.file("gradle/stonecutter-processor.gradle")
+
+// ── Определение доступных версий и текущей активной версии ──
+def versionsDir = file("versions")
+def availableVersions = versionsDir.exists() ? (versionsDir.listFiles()?.findAll { 
+    it.isDirectory() && new File(it, "gradle.properties").exists() 
+}?.collect { it.name }?.sort() ?: []) : []
+
+// Функция синхронизации свойств версии в gradle.properties и stonecutter.gradle
+def syncVersionProperties = { String targetVer ->
+    File verPropsFile = file("versions/${targetVer}/gradle.properties")
+    if (!verPropsFile.exists()) {
+        throw new GradleException("Версия '${targetVer}' не найдена в папке versions/! Доступные версии: ${availableVersions.join(', ')}")
+    }
+
+    Properties verProps = new Properties()
+    verPropsFile.withInputStream { verProps.load(it) }
+
+    File rootPropsFile = file("gradle.properties")
+    List<String> lines = rootPropsFile.readLines()
+    List<String> newLines = []
+
+    Set<String> keysToUpdate = verProps.stringPropertyNames()
+    Set<String> updatedKeys = [] as Set
+
+    for (String line : lines) {
+        String trimmed = line.trim()
+        if (trimmed.startsWith("#") || !trimmed.contains("=")) {
+            newLines.add(line)
+            continue
+        }
+        String key = trimmed.substring(0, trimmed.indexOf("=")).trim()
+        if (keysToUpdate.contains(key)) {
+            newLines.add("${key}=${verProps.getProperty(key)}")
+            updatedKeys.add(key)
+        } else {
+            newLines.add(line)
+        }
+    }
+    for (String key : keysToUpdate) {
+        if (!updatedKeys.contains(key)) {
+            newLines.add("${key}=${verProps.getProperty(key)}")
+        }
+    }
+
+    rootPropsFile.text = newLines.join("\n") + "\n"
+
+    // Синхронизация stonecutter.gradle
+    File scFile = file("stonecutter.gradle")
+    if (scFile.exists()) {
+        String scText = scFile.text
+        scText = scText.replaceAll(/stonecutter\.active\s+"[^"]+"/, "stonecutter.active \"${targetVer}\"")
+        scFile.text = scText
+    }
+
+    // Обработка условных комментариев Stonecutter (//? if ...)
+    preprocessSourceFiles(targetVer)
+
+    println "=================================================="
+    println "✓ Успешно переключено на Minecraft ${targetVer}"
+    println "  Обновлены: gradle.properties, stonecutter.gradle"
+    println "  Для сборки запустите: ./gradlew build"
+    println "=================================================="
+}
+
+// ── Определение запрошенной версии и ранняя синхронизация ──
+def requestedTargetVer = project.findProperty("to") ?: project.findProperty("target") ?: project.findProperty("ver") ?: project.findProperty("mc")
+
+if (!requestedTargetVer) {
+    def taskNamesList = gradle.startParameter.taskNames
+    for (int i = 0; i < taskNamesList.size(); i++) {
+        def rawTask = taskNamesList[i].replaceFirst("^:", "")
+        if (rawTask == "to" && i + 1 < taskNamesList.size()) {
+            def nextArg = taskNamesList[i + 1].replaceFirst("^:", "")
+            if (availableVersions.contains(nextArg)) {
+                requestedTargetVer = nextArg
+                break
+            }
+        } else if (rawTask.startsWith("to") && availableVersions.contains(rawTask.substring(2))) {
+            requestedTargetVer = rawTask.substring(2)
+            break
+        }
+    }
+}
+
+if (requestedTargetVer) {
+    syncVersionProperties(requestedTargetVer.toString().trim())
+}
+
+// ── Определение версии Java Toolchain в зависимости от версии Minecraft ──
+def mcVersion = rootProject.findProperty("minecraft_version") ?: ""
+def targetJavaVersion = mcVersion.startsWith("26.") ? 25 : 21
 
 architectury {
     minecraft = rootProject.minecraft_version
@@ -42,27 +134,37 @@ allprojects {
     apply plugin: "maven-publish"
 
     base {
-        archivesName = rootProject.archives_base_name
+        archivesName = rootProject.findProperty("archives_base_name") ?: rootProject.archives_base_name
     }
 
-    version = rootProject.mod_version
-    group = rootProject.maven_group
+    version = rootProject.findProperty("mod_version") ?: rootProject.mod_version
+    group = rootProject.findProperty("maven_group") ?: rootProject.maven_group
 
     tasks.withType(JavaCompile).configureEach {
+        doFirst {
+            rootProject.preprocessSourceFiles(rootProject.minecraft_version)
+        }
         options.encoding = "UTF-8"
-        options.release = 25
+        options.release = targetJavaVersion
     }
 
     java {
         withSourcesJar()
         toolchain {
-            languageVersion = JavaLanguageVersion.of(25)
+            languageVersion = JavaLanguageVersion.of(targetJavaVersion)
         }
     }
 }
 
 subprojects {
-    apply plugin: "dev.architectury.loom-no-remap"
+    def currentMc = rootProject.findProperty("minecraft_version")?.toString() ?: ""
+    def isObfuscated = currentMc.startsWith("1.")
+
+    if (isObfuscated) {
+        apply plugin: "dev.architectury.loom"
+    } else {
+        apply plugin: "dev.architectury.loom-no-remap"
+    }
 
     loom {
         silentMojangMappingsLicense()
@@ -70,6 +172,166 @@ subprojects {
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        minecraft "com.mojang:minecraft:${currentMc}"
+        if (isObfuscated) {
+            mappings loom.officialMojangMappings()
+        }
+    }
+}
+
+// ── Кастомный роутинг артефактов (remapJar / shadowJar) для fabric и neoforge ──
+subprojects {
+    if (project.name == "fabric" || project.name == "neoforge") {
+        afterEvaluate {
+            def isObf = rootProject.findProperty("minecraft_version")?.toString()?.startsWith("1.") ?: false
+            def finalJarTask = isObf ? (tasks.findByName("remapJar") ?: tasks.findByName("shadowJar")) : tasks.findByName("shadowJar")
+            if (finalJarTask != null) {
+                def platform = project.name
+                def currentMc = rootProject.findProperty("minecraft_version") ?: ""
+                def currentModVer = rootProject.findProperty("mod_version") ?: ""
+
+                finalJarTask.archiveFileName.set("LifeXPChallenge-${currentModVer}-${platform}-${currentMc}.jar")
+                finalJarTask.destinationDirectory.set(rootProject.layout.projectDirectory.dir("releases/${currentMc}/${platform}"))
+            }
+        }
+    }
+}
+
+// ── Таски переключения версий и мульти-сборки ──
+if (project == rootProject) {
+    def isSingleBuild = project.hasProperty("singleBuild") && project.property("singleBuild").toString() == "true"
+    def startTasks = gradle.startParameter.taskNames.collect { it.replaceFirst("^:", "") }
+    def isBuildRequested = startTasks.contains("build") || startTasks.contains("buildAll") || startTasks.contains("assemble")
+    def isMultiBuild = !isSingleBuild && !requestedTargetVer && isBuildRequested
+
+    if (isMultiBuild) {
+        subprojects {
+            tasks.matching { it.name in ["build", "assemble", "classes", "jar", "shadowJar", "remapJar"] }.configureEach {
+                enabled = false
+            }
+        }
+    }
+
+    def runMultiBuild = {
+        def originalMc = rootProject.findProperty("minecraft_version")?.toString() ?: "26.2"
+        def preferredOrder = ["26.2", "26.1", "26.3", "1.21.4", "1.21.1"]
+        def targetVersions = preferredOrder.findAll { availableVersions.contains(it) } +
+                             availableVersions.findAll { !preferredOrder.contains(it) }
+
+        println "\n" + "=" * 68
+        println "        МУЛЬТИ-ВЕРСИОННАЯ СБОРКА: ПРОВЕРКА ВСЕХ ВЕРСИЙ"
+        println "  Версии к проверке: ${targetVersions.join(', ')}"
+        println "=" * 68
+
+        Map<String, String> results = [:]
+        int total = targetVersions.size()
+        int count = 0
+
+        targetVersions.each { ver ->
+            count++
+            println "\n" + "-" * 68
+            println ">>> [${count}/${total}] Проверка и сборка для Minecraft ${ver}..."
+            println "-" * 68
+
+            def process = new ProcessBuilder("./gradlew", "-PsingleBuild=true", "to", ver, "build", "--console=plain")
+                .directory(rootDir)
+                .inheritIO()
+                .start()
+            int exitCode = process.waitFor()
+
+            if (exitCode == 0) {
+                results[ver] = "SUCCESS"
+                println "\n>>> [${ver}] [✓] УСПЕШНО СОБРАНО -> releases/${ver}/"
+            } else {
+                results[ver] = "FAILED"
+                println "\n>>> [${ver}] [✗] ОШИБКА СБОРКИ (пропускаем к следующей версии)"
+            }
+        }
+
+        // Возвращаем рабочее окружение к исходной версии
+        if (originalMc && availableVersions.contains(originalMc)) {
+            syncVersionProperties(originalMc)
+        }
+
+        println "\n" + "=" * 68
+        println "                 СВОДКА МУЛЬТИ-СБОРКИ"
+        println "=" * 68
+        int successCount = 0
+        int failCount = 0
+        results.each { ver, status ->
+            if (status == "SUCCESS") {
+                successCount++
+                println String.format("  [✓] Minecraft %-8s : УСПЕШНО  (releases/%s/)", ver, ver)
+            } else {
+                failCount++
+                println String.format("  [✗] Minecraft %-8s : ОШИБКА   (см. лог выше)", ver)
+            }
+        }
+        println "=" * 68
+        println "Итог: ${successCount} из ${total} версий собраны успешно!"
+        println "Все готовые JAR-файлы сохранены в папке releases/"
+        println "Текущая активная версия в проекте: Minecraft ${originalMc}"
+        println "=" * 68 + "\n"
+    }
+
+    tasks.register("to") {
+        group = "version"
+        description = "Переключение версии: ./gradlew to <версия> или ./gradlew to -Pto=<версия>"
+        doLast {
+            if (!requestedTargetVer) {
+                println "Использование: ./gradlew to <версия>  (например: ./gradlew to 26.1)"
+                println "Или:           ./gradlew to -Pto=<версия>"
+                println "Доступные версии: ${availableVersions.join(', ')}"
+                return
+            }
+            syncVersionProperties(requestedTargetVer.toString().trim())
+        }
+    }
+
+    availableVersions.each { ver ->
+        tasks.register("to${ver}") {
+            group = "version"
+            description = "Переключить на Minecraft ${ver}"
+            doLast {
+                syncVersionProperties(ver)
+            }
+        }
+
+        if (!tasks.findByName(ver)) {
+            tasks.register(ver) {
+                group = "version"
+                description = "Маркер версии ${ver} для синтаксиса 'to ${ver}'"
+                doLast {}
+            }
+        }
+    }
+
+    if (isMultiBuild) {
+        tasks.named("build").configure {
+            doLast {
+                runMultiBuild()
+            }
+        }
+    } else {
+        tasks.named("build").configure {
+            subprojects.each { sp ->
+                dependsOn("${sp.path}:build")
+            }
+        }
+    }
+
+    tasks.register("buildAll") {
+        group = "build"
+        description = "Собрать мод для всех доступных версий в папку releases/"
+        doLast {
+            runMultiBuild()
+        }
+    }
+
+    tasks.matching { it.name.startsWith("Set active project to ") }.configureEach {
+        def targetVer = it.name.substring("Set active project to ".length()).trim()
+        doLast {
+            syncVersionProperties(targetVer)
+        }
     }
 }

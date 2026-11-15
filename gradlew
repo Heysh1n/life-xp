@@ -154,6 +154,21 @@ if $cygwin ; then
     esac
 fi
 
+# Rewrite -to / --to syntax to 'to' task for convenience
+for arg do
+    case "$arg" in
+        -to|--to) arg="to" ;;
+        -to=*|--to=*)
+            val="${arg#*=}"
+            eval "set -- \"\$@\" \"to\" \"\$val\""
+            shift
+            continue
+            ;;
+    esac
+    eval "set -- \"\$@\" \"\$arg\""
+    shift
+done
+
 # Escape application args
 save () {
     for i do printf %s\\n "$i" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/" ; done

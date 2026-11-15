@@ -50,6 +50,8 @@ public class LifeXpConfigScreen {
         LifeXpConfig config   = LifeXpConfig.INSTANCE;
         LifeXpConfig defaults = new LifeXpConfig();
 
+        boolean isSingleplayer = Minecraft.getInstance().hasSingleplayerServer();
+
         var builder = YetAnotherConfigLib.createBuilder()
                 .title(Component.translatable("lifexp.config.title"))
                 .save(LifeXpConfig::save);
@@ -70,6 +72,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.core.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyCore))
+                                .available(isSingleplayer)
                                 .build())
 
                         // ── Пресет 2: Vanilla+ ──
@@ -78,6 +81,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.vanilla_plus.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyVanillaPlus))
+                                .available(isSingleplayer)
                                 .build())
 
                         // ── Пресет 3: BabyMode ──
@@ -86,6 +90,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.baby_mode.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyBabyMode))
+                                .available(isSingleplayer)
                                 .build())
 
                         // ── Пресет 4: Real Hardcore ──
@@ -94,6 +99,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.real_hardcore.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyRealHardcore))
+                                .available(isSingleplayer)
                                 .build())
 
                         // ── Пресет 5: Core (No Streaks) ──
@@ -102,6 +108,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.core_no_streaks.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyCoreNoStreaks))
+                                .available(isSingleplayer)
                                 .build())
 
                         // ── Пресет 6: Purist ──
@@ -110,6 +117,7 @@ public class LifeXpConfigScreen {
                                 .description(OptionDescription.of(
                                         Component.translatable("lifexp.config.preset.purist.desc")))
                                 .action((screen, opt) -> applyPresetAndReopen(screen, parent, LifeXpPresets::applyPurist))
+                                .available(isSingleplayer)
                                 .build())
 
                         .build())
@@ -241,9 +249,16 @@ public class LifeXpConfigScreen {
     // ════════════════════════════════════════════════════════════
 
     private static void applyPresetAndReopen(Screen currentScreen, Screen parent, Runnable presetApplier) {
+        if (!Minecraft.getInstance().hasSingleplayerServer()) {
+            return;
+        }
         presetApplier.run();
         LifeXpConfig.save();
+//? if >= 26.1 {
         Minecraft.getInstance().setScreenAndShow(create(parent));
+//?} else {
+      /*Minecraft.getInstance().setScreen(create(parent));*/
+//?}
     }
 
 }

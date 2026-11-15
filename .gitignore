@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE (IntelliJ IDEA, VSCode)
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.bsp/
+
+# Stonecutter & Custom Releases
+.stonecutter/
+releases/
+
+# Architectury / Loom (Среда выполнения Minecraft)
+run/
+*/run/
+.architectury-transformer/
+*/.architectury-transformer/
+.fabric/
+*/.fabric/
+.neoforge/
+*/.neoforge/
+
+# Логи и кэш (на случай если они вылезли за пределы run/)
+crash-reports/
+logs/
+usercache.json
+usernamecache.json
+options.txt
+
+# OS Files
+.DS_Store
+Thumbs.db

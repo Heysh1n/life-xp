@@ -29,6 +29,28 @@ import java.util.Map;
 
 public final class LifeXpCommand {
 
+//? if >= 26.1 {
+    private static ClickEvent clickRunCommand(String cmd) {
+        return new ClickEvent.RunCommand(cmd);
+    }
+    private static ClickEvent clickCopyToClipboard(String text) {
+        return new ClickEvent.CopyToClipboard(text);
+    }
+    private static HoverEvent hoverShowText(Component text) {
+        return new HoverEvent.ShowText(text);
+    }
+//?} else {
+  /*private static ClickEvent clickRunCommand(String cmd) {
+        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd);
+    }
+    private static ClickEvent clickCopyToClipboard(String text) {
+        return new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, text);
+    }
+    private static HoverEvent hoverShowText(Component text) {
+        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, text);
+    }*/
+//?}
+
     private static final String[] ATTR_KEYS = {
             "max_health", "movement_speed", "attack_damage", "attack_speed",
             "armor_toughness", "knockback_resistance", "block_interaction_range",
@@ -41,7 +63,11 @@ public final class LifeXpCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("lifexp")
+//? if >= 26.1 {
                 .requires(source -> source.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))
+//?} else {
+              /*.requires(source -> source.hasPermission(2))*/
+//?}
 
                 .then(Commands.literal("reload")
                         .executes(LifeXpCommand::executeReload))
@@ -156,7 +182,7 @@ public final class LifeXpCommand {
 
             Component details = Component.literal(" [Детали...]").withStyle(style -> style
                 .withColor(ChatFormatting.DARK_GREEN)
-                .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(hoverText)));
+                .withHoverEvent(hoverShowText(hoverText)));
 
             source.sendSuccess(() -> Component.literal("  • ").withStyle(ChatFormatting.DARK_GRAY)
                     .append(Component.translatable("lifexp.attr." + key).withStyle(ChatFormatting.GOLD))
@@ -172,11 +198,11 @@ public final class LifeXpCommand {
         final int finalPage = page;
         // Footer Pagination
         Component prev = page > 1 
-            ? Component.literal("[◀]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/lifexp status " + (finalPage - 1))))
+            ? Component.literal("[◀]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(clickRunCommand("/lifexp status " + (finalPage - 1))))
             : Component.literal("[◀]").withStyle(ChatFormatting.DARK_GRAY);
 
         Component next = page < totalPages 
-            ? Component.literal("[▶]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/lifexp status " + (finalPage + 1))))
+            ? Component.literal("[▶]").withStyle(style -> style.withColor(ChatFormatting.GOLD).withClickEvent(clickRunCommand("/lifexp status " + (finalPage + 1))))
             : Component.literal("[▶]").withStyle(ChatFormatting.DARK_GRAY);
 
         
@@ -213,7 +239,7 @@ public final class LifeXpCommand {
 
         Component details = Component.literal(" [Детали...]").withStyle(style -> style
             .withColor(ChatFormatting.DARK_GREEN)
-            .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(hoverText)));
+            .withHoverEvent(hoverShowText(hoverText)));
 
         ctx.getSource().sendSuccess(() -> MessageUtils.prefixShort()
                 .append(Component.translatable("lifexp.attr." + attrName).withStyle(ChatFormatting.GOLD))
@@ -272,7 +298,11 @@ public final class LifeXpCommand {
         ServerPlayer player = source.getPlayer();
 
         // Проверяем перманентную блокировку выбора пресета (Origins-style)
+//? if >= 26.1 {
         if (LifeXpConfig.INSTANCE.isLockPresetAfterSelection() && player != null && player.entityTags().contains(PRESET_TAG)) {
+//?} else {
+      /*if (LifeXpConfig.INSTANCE.isLockPresetAfterSelection() && player != null && player.getTags().contains(PRESET_TAG)) {*/
+//?}
             source.sendFailure(MessageUtils.prefixShort().append(Component.translatable("lifexp.error.preset_locked")
                     .withStyle(ChatFormatting.RED)));
             return 0;
@@ -307,8 +337,8 @@ public final class LifeXpCommand {
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GREEN)
                         .withUnderlined(true)
-                        .withClickEvent(new net.minecraft.network.chat.ClickEvent.CopyToClipboard(json))
-                        .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(Component.translatable("lifexp.command.export.hover"))))), false);
+                        .withClickEvent(clickCopyToClipboard(json))
+                        .withHoverEvent(hoverShowText(Component.translatable("lifexp.command.export.hover"))))), false);
         return 1;
     }
 

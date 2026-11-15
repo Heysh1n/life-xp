@@ -23,6 +23,8 @@ public class LifeXpConfig {
     private boolean enableKillStreak = true;
     private boolean showHudBubbles = true;
     private boolean lockPresetAfterSelection = true;
+    private boolean isPresetInitialized = false;
+    private long presetLockedUntil = 0L;
 
     private final Map<String, AttributeConfigNode> nodes = new LinkedHashMap<>();
 
@@ -67,6 +69,12 @@ public class LifeXpConfig {
     public boolean isLockPresetAfterSelection() { return lockPresetAfterSelection; }
     public void setLockPresetAfterSelection(boolean lockPresetAfterSelection) { this.lockPresetAfterSelection = lockPresetAfterSelection; }
 
+    public boolean isPresetInitialized() { return isPresetInitialized; }
+    public void setPresetInitialized(boolean presetInitialized) { this.isPresetInitialized = presetInitialized; }
+
+    public long getPresetLockedUntil() { return presetLockedUntil; }
+    public void setPresetLockedUntil(long presetLockedUntil) { this.presetLockedUntil = presetLockedUntil; }
+
     public AttributeConfigNode getNode(String key) { return nodes.get(key); }
     public Map<String, AttributeConfigNode> getNodes() { return nodes; }
 
@@ -83,6 +91,8 @@ public class LifeXpConfig {
                     if (root.has("enableKillStreak")) config.setEnableKillStreak(root.get("enableKillStreak").getAsBoolean());
                     if (root.has("showHudBubbles")) config.setShowHudBubbles(root.get("showHudBubbles").getAsBoolean());
                     if (root.has("lockPresetAfterSelection")) config.setLockPresetAfterSelection(root.get("lockPresetAfterSelection").getAsBoolean());
+                    if (root.has("isPresetInitialized")) config.setPresetInitialized(root.get("isPresetInitialized").getAsBoolean());
+                    if (root.has("presetLockedUntil")) config.setPresetLockedUntil(root.get("presetLockedUntil").getAsLong());
                     if (root.has("attributes")) {
                         JsonObject attrs = root.getAsJsonObject("attributes");
                         for (Map.Entry<String, AttributeConfigNode> entry : config.nodes.entrySet()) {
@@ -113,6 +123,8 @@ public class LifeXpConfig {
         root.addProperty("enableKillStreak", INSTANCE.enableKillStreak);
         root.addProperty("showHudBubbles", INSTANCE.showHudBubbles);
         root.addProperty("lockPresetAfterSelection", INSTANCE.lockPresetAfterSelection);
+        root.addProperty("isPresetInitialized", INSTANCE.isPresetInitialized);
+        root.addProperty("presetLockedUntil", INSTANCE.presetLockedUntil);
 
         JsonObject attrs = new JsonObject();
         for (Map.Entry<String, AttributeConfigNode> entry : INSTANCE.nodes.entrySet()) {

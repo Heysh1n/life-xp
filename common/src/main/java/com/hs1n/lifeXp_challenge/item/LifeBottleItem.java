@@ -16,7 +16,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+//? if >= 26.1 {
 import net.minecraft.world.item.component.TooltipDisplay;
+//?}
+//? if < 1.21.4 {
+/*import net.minecraft.world.InteractionResultHolder;*/
+//?}
+import java.util.List;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
@@ -58,7 +64,11 @@ public class LifeBottleItem extends Item {
      */
     public static int getEmptySlotCount(Inventory inventory) {
         int count = 0;
+//? if >= 26.1 {
         for (ItemStack item : inventory.getNonEquipmentItems()) {
+//?} else {
+      /*for (ItemStack item : inventory.items) {*/
+//?}
             if (item.isEmpty()) count++;
         }
         for (int i = 0; i < 4; i++) {
@@ -70,8 +80,13 @@ public class LifeBottleItem extends Item {
         return count;
     }
 
+//? if >= 1.21.4 {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+//?} else {
+  /*@Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {*/
+//?}
         ItemStack stack = player.getItemInHand(hand);
 
         if (hasSavedInventory(stack)) {
@@ -88,7 +103,11 @@ public class LifeBottleItem extends Item {
                         // Жестко отменяем и выводим красное сообщение
                         MessageUtils.sendActionBarError(player, "lifexp.message.not_enough_space");
                     }
+//? if >= 1.21.4 {
                     return InteractionResult.FAIL;
+//?} else {
+                  /*return InteractionResultHolder.fail(stack);*/
+//?}
                 }
 
                 // 3. Только если места 100% хватает, выполняем распаковку
@@ -96,11 +115,19 @@ public class LifeBottleItem extends Item {
                     unpackInventory(level, player, stack, savedInv);
                 }
 
+//? if >= 1.21.4 {
                 return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.PASS;
     }
+//?} else {
+              /*return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+            }
+        }
+        return InteractionResultHolder.pass(stack);
+    }*/
+//?}
 
     private void unpackInventory(Level level, Player player, ItemStack stack, SavedInventory savedInv) {
         if (savedInv.isEmpty()) return;
@@ -160,7 +187,11 @@ public class LifeBottleItem extends Item {
 
                 // Шаг 4: Экстренный сброс на землю
                 if (!placed) {
-                    player.drop(item, false);
+//? if >= 26.3 {
+                    player.drop(item, false, net.minecraft.util.Prediction.SERVER_ONLY);
+//?} else {
+                    /*player.drop(item, false);*/
+//?}
                 }
             }
         }
@@ -191,8 +222,25 @@ public class LifeBottleItem extends Item {
         return false;
     }
 
+//? if >= 26.1 {
+    private static boolean isShiftDown() {
+        return Minecraft.getInstance().hasShiftDown();
+    }
+//?} else {
+    /*private static boolean isShiftDown() {
+        return net.minecraft.client.gui.screens.Screen.hasShiftDown();
+    }*/
+//?}
+
+//? if >= 26.1 {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        Consumer<Component> out = tooltip;
+//?} else {
+  /*@Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        Consumer<Component> out = tooltip::add;*/
+//?}
         int usesLeft = Math.max(0, stack.getMaxDamage() - stack.getDamageValue());
         
         ChatFormatting durabilityColor = ChatFormatting.GREEN;
@@ -205,19 +253,19 @@ public class LifeBottleItem extends Item {
 
         if (hasSavedInventory(stack)) {
             int itemCount = getSavedInventory(stack).size();
-            tooltip.accept(Component.translatable("lifexp.life_bottle.contains_items", itemCount)
+            out.accept(Component.translatable("lifexp.life_bottle.contains_items", itemCount)
                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         }
 
-        if (Minecraft.getInstance().hasShiftDown()) {
-            tooltip.accept(Component.translatable("item.life_xp_challenge.life_bottle.desc")
+        if (isShiftDown()) {
+            out.accept(Component.translatable("item.life_xp_challenge.life_bottle.desc")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
-            tooltip.accept(Component.translatable("lifexp.tooltip.hold_shift")
+            out.accept(Component.translatable("lifexp.tooltip.hold_shift")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
 
-        tooltip.accept(Component.translatable("lifexp.life_bottle.durability", usesLeft, stack.getMaxDamage())
+        out.accept(Component.translatable("lifexp.life_bottle.durability", usesLeft, stack.getMaxDamage())
                 .withStyle(durabilityColor));
     }
 }

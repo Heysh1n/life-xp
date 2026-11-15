@@ -44,8 +44,13 @@ public class KillStreakService {
         // Notify every 10 kills
         if (streak % 10 == 0) {
             double bonus = streak * STREAK_BONUS_PER_KILL * 100;
+//? if >= 26.1 {
             player.sendOverlayMessage(Component.translatable("lifexp.message.kill_streak", streak, (int) bonus)
                     .withStyle(ChatFormatting.GOLD));
+//?} else {
+          /*player.displayClientMessage(Component.translatable("lifexp.message.kill_streak", streak, (int) bonus)
+                    .withStyle(ChatFormatting.GOLD), true);*/
+//?}
         }
     }
 
@@ -98,8 +103,18 @@ public class KillStreakService {
 
     // ── Tag-based persistent storage helpers ──
 
+//? if >= 26.1 {
+    private static java.util.Set<String> playerTags(ServerPlayer player) {
+        return player.entityTags();
+    }
+//?} else {
+  /*private static java.util.Set<String> playerTags(ServerPlayer player) {
+        return player.getTags();
+    }*/
+//?}
+
     private static int getTagInt(ServerPlayer player, String prefix) {
-        for (String tag : player.entityTags()) {
+        for (String tag : playerTags(player)) {
             if (tag.startsWith(prefix)) {
                 try {
                     return Integer.parseInt(tag.substring(prefix.length()));
@@ -111,12 +126,12 @@ public class KillStreakService {
     }
 
     private static void setTagInt(ServerPlayer player, String prefix, int value) {
-        player.entityTags().removeIf(tag -> tag.startsWith(prefix));
+        playerTags(player).removeIf(tag -> tag.startsWith(prefix));
         player.addTag(prefix + value);
     }
 
     private static long getTagLong(ServerPlayer player, String prefix) {
-        for (String tag : player.entityTags()) {
+        for (String tag : playerTags(player)) {
             if (tag.startsWith(prefix)) {
                 try {
                     return Long.parseLong(tag.substring(prefix.length()));
@@ -128,11 +143,11 @@ public class KillStreakService {
     }
 
     private static void setTagLong(ServerPlayer player, String prefix, long value) {
-        player.entityTags().removeIf(tag -> tag.startsWith(prefix));
+        playerTags(player).removeIf(tag -> tag.startsWith(prefix));
         player.addTag(prefix + value);
     }
 
     private static void removeTag(ServerPlayer player, String prefix) {
-        player.entityTags().removeIf(tag -> tag.startsWith(prefix));
+        playerTags(player).removeIf(tag -> tag.startsWith(prefix));
     }
 }

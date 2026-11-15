@@ -11,12 +11,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -30,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class XpHarvesterService {
 
+//? if >= 26.1 {
     public static final Identifier ENCHANTMENT_ID =
             Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "xp_harvester");
 
@@ -39,9 +45,36 @@ public final class XpHarvesterService {
             TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "lapis_ores"));
     private static final TagKey<Block> REDSTONE_ORES =
             TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "redstone_ores"));
+//?} else {
+  /*public static final ResourceLocation ENCHANTMENT_ID =
+            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "xp_harvester");
+
+    private static final TagKey<Block> DIAMOND_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    private static final TagKey<Block> LAPIS_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    private static final TagKey<Block> REDSTONE_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_ores"));*/
+//?}
 
     public static void init() {
+//? if >= 26.1 {
         BlockEvent.BREAK.register(XpHarvesterService::onBlockBreak);
+//?} else {
+      /*BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(level, pos, state, player));*/
+//?}
+        BlockEvent.PLACE.register(XpHarvesterService::onBlockPlace);
+    }
+
+    public static EventResult onBlockPlace(Level level, BlockPos pos, BlockState state, @Nullable Entity entity) {
+        if (level instanceof ServerLevel serverLevel) {
+            if (state.is(Blocks.ANCIENT_DEBRIS)) {
+                PlacedBlockTracker tracker = PlacedBlockTracker.get(serverLevel);
+                tracker.add(pos);
+                tracker.setDirty();
+            }
+        }
+        return EventResult.pass();
     }
 
     public static int getHarvesterLevel(ItemStack tool) {
@@ -81,6 +114,12 @@ public final class XpHarvesterService {
 
         // 2. Ancient Debris -> 1% от общего опыта игрока, жесткий хардкап Math.min(bonus, 500).
         if (state.is(Blocks.ANCIENT_DEBRIS)) {
+            PlacedBlockTracker tracker = PlacedBlockTracker.get(serverLevel);
+            if (tracker.contains(pos)) {
+                tracker.remove(pos);
+                tracker.setDirty();
+                return EventResult.pass();
+            }
             long totalPlayerXp = ExperienceUtils.getPlayerTotalXp(player);
             int bonus = (int) Math.floor(totalPlayerXp * 0.01);
             bonus = Math.min(bonus, 500);

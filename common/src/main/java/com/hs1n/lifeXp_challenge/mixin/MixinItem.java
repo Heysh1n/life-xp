@@ -11,7 +11,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
+//? if >= 1.21.4 {
 import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+/*import net.minecraft.world.item.UseAnim;*/
+//?}
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,12 +29,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public abstract class MixinItem {
 
+//? if >= 1.21.4 {
     @Inject(method = "getUseAnimation", at = @At("HEAD"), cancellable = true)
     private void lifeXp$getUseAnimation(ItemStack stack, CallbackInfoReturnable<ItemUseAnimation> cir) {
         if (stack.is(Items.GLASS_BOTTLE)) {
             cir.setReturnValue(ItemUseAnimation.BOW);
         }
     }
+//?} else {
+  /*@Inject(method = "getUseAnimation", at = @At("HEAD"), cancellable = true)
+    private void lifeXp$getUseAnimation(ItemStack stack, CallbackInfoReturnable<UseAnim> cir) {
+        if (stack.is(Items.GLASS_BOTTLE)) {
+            cir.setReturnValue(UseAnim.BOW);
+        }
+    }*/
+//?}
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void lifeXp$getUseDuration(ItemStack stack, LivingEntity entity, CallbackInfoReturnable<Integer> cir) {

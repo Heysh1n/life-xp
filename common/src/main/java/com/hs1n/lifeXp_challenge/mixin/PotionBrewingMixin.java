@@ -1,4 +1,5 @@
-package com.hs1n.lifeXp_challenge.mixin;
+//? if < 26.3 {
+/*package com.hs1n.lifeXp_challenge.mixin;
 
 import com.hs1n.lifeXp_challenge.registry.ModItems;
 import com.hs1n.lifeXp_challenge.registry.ModPotions;
@@ -24,4 +25,5 @@ public abstract class PotionBrewingMixin {
         // Сильное зелье XP-Щита II + Звезда Незера = Ультра зелье XP-Щита III (1:00)
         builder.addMix(ModPotions.STRONG_XP_SHIELD, Items.NETHER_STAR, ModPotions.ULTRA_XP_SHIELD);
     }
-}
+}*/
+//?}

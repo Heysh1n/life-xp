@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Player.class)
 public abstract class PlayerDamageMixin {
 
+//? if > 1.21.1 {
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private float lifeXp$absorbDamageWithXp(float amount, ServerLevel level, DamageSource source) {
         Player player = (Player) (Object) this;
@@ -30,4 +31,22 @@ public abstract class PlayerDamageMixin {
             com.hs1n.lifeXp_challenge.service.AdvancementService.checkLifeOrDeath(serverPlayer);
         }
     }
+//?} else {
+  /*@ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private float lifeXp$absorbDamageWithXp(float amount, DamageSource source) {
+        Player player = (Player) (Object) this;
+        if (player instanceof ServerPlayer serverPlayer) {
+            return XpShieldService.absorbDamage(serverPlayer, source, amount);
+        }
+        return amount;
+    }
+
+    @Inject(method = "actuallyHurt", at = @At("TAIL"))
+    private void lifeXp$checkLifeOrDeath(DamageSource damageSource, float amount, CallbackInfo ci) {
+        Player player = (Player) (Object) this;
+        if (player instanceof ServerPlayer serverPlayer) {
+            com.hs1n.lifeXp_challenge.service.AdvancementService.checkLifeOrDeath(serverPlayer);
+        }
+    }*/
+//?}
 }

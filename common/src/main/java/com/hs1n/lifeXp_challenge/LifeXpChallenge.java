@@ -41,24 +41,34 @@ public class LifeXpChallenge {
         });
 
         // Right-click crop harvest & AoE hoe
+//? if == 1.21.4 {
+        /*InteractionEvent.RIGHT_CLICK_BLOCK.register((player, hand, pos, face) ->
+                CropHarvestService.onRightClickBlock(player, hand, pos, face).asMinecraft()
+        );*/
+//?} else {
         InteractionEvent.RIGHT_CLICK_BLOCK.register(CropHarvestService::onRightClickBlock);
+//?}
 
         PlayerEvent.PLAYER_JOIN.register(player -> {
             AttributeService.recalculate(player);
             KillStreakService.onPlayerJoin(player);
-            if (!player.entityTags().contains(LifeXpCommand.PRESET_TAG)) {
+//? if >= 26.1 {
+            if (!LifeXpConfig.INSTANCE.isPresetInitialized() && !player.entityTags().contains(LifeXpCommand.PRESET_TAG)) {
+//?} else {
+          /*if (!LifeXpConfig.INSTANCE.isPresetInitialized() && !player.getTags().contains(LifeXpCommand.PRESET_TAG)) {*/
+//?}
                 com.hs1n.lifeXp_challenge.network.LifeXpNetworking.sendOpenPresetScreen(player);
             }
         });
 
-        PlayerEvent.PLAYER_RESPAWN.register((net.minecraft.server.level.ServerPlayer player, boolean conqueredEnd, net.minecraft.world.entity.Entity.RemovalReason removalReason) -> {
+        PlayerEvent.PLAYER_RESPAWN.register((player, conqueredEnd, removalReason) -> {
             AttributeService.recalculate(player);
             if (!conqueredEnd) {
                 KillStreakService.resetStreak(player);
             }
         });
 
-        PlayerEvent.CHANGE_DIMENSION.register((net.minecraft.server.level.ServerPlayer player, net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> oldLevel, net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> newLevel) -> {
+        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> {
             AttributeService.recalculate(player);
         });
 

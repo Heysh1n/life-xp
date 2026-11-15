@@ -12,7 +12,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.HoeItem;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
@@ -44,7 +44,7 @@ public final class CropHarvestService {
 
         // AoE: if holding a hoe with XP Harvester level >= 2
         ItemStack tool = serverPlayer.getMainHandItem();
-        if (tool.getItem() instanceof HoeItem && XpHarvesterService.getHarvesterLevel(tool) >= 2) {
+        if (tool.is(ItemTags.HOES) && XpHarvesterService.getHarvesterLevel(tool) >= 2) {
             tool.hurtAndBreak(1, serverPlayer, EquipmentSlot.MAINHAND);
             int extraHarvested = 0;
             int maxExtra = 3;

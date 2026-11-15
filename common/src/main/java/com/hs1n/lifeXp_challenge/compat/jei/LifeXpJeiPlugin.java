@@ -11,7 +11,11 @@ import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -24,12 +28,29 @@ import java.util.List;
 @JeiPlugin
 public class LifeXpJeiPlugin implements IModPlugin {
 
+//? if >= 26.1 {
     public static final Identifier PLUGIN_UID = Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "jei_plugin");
 
     @Override
     public Identifier getPluginUid() {
         return PLUGIN_UID;
     }
+
+    private static Identifier jeiId(String path) {
+        return Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, path);
+    }
+//?} else {
+  /*public static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "jei_plugin");
+
+    @Override
+    public ResourceLocation getPluginUid() {
+        return PLUGIN_UID;
+    }
+
+    private static ResourceLocation jeiId(String path) {
+        return ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, path);
+    }*/
+//?}
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
@@ -59,7 +80,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                 List.of(ModItems.SHIELD_CORE.get().getDefaultInstance()),
                 awkward,
                 xpShield1,
-                Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/xp_shield")
+                jeiId("brewing/xp_shield")
         ));
 
         // 2. Potion of XP Shield I + Redstone = Long Potion of XP Shield I (8:00)
@@ -68,7 +89,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                 List.of(Items.REDSTONE.getDefaultInstance()),
                 xpShield1,
                 longXpShield1,
-                Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/long_xp_shield")
+                jeiId("brewing/long_xp_shield")
         ));
 
         // 3. Potion of XP Shield I + Glowstone Dust = Strong Potion of XP Shield II (1:30)
@@ -77,7 +98,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                 List.of(Items.GLOWSTONE_DUST.getDefaultInstance()),
                 xpShield1,
                 strongXpShield2,
-                Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/strong_xp_shield")
+                jeiId("brewing/strong_xp_shield")
         ));
 
         // 4. Strong Potion of XP Shield II + Nether Star = Ultra Potion of XP Shield III (1:00)
@@ -86,7 +107,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                 List.of(Items.NETHER_STAR.getDefaultInstance()),
                 strongXpShield2,
                 ultraXpShield3,
-                Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/ultra_xp_shield")
+                jeiId("brewing/ultra_xp_shield")
         ));
 
         // 5 & 6. Взрывные (Gunpowder) и Оседающие (Dragon's Breath) зелья для всех 4 ступеней
@@ -108,7 +129,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                     List.of(Items.GUNPOWDER.getDefaultInstance()),
                     normal,
                     splash,
-                    Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/splash_" + index)
+                    jeiId("brewing/splash_" + index)
             ));
 
             // Splash + Dragon's Breath -> Lingering
@@ -116,7 +137,7 @@ public class LifeXpJeiPlugin implements IModPlugin {
                     List.of(Items.DRAGON_BREATH.getDefaultInstance()),
                     splash,
                     lingering,
-                    Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "brewing/lingering_" + index)
+                    jeiId("brewing/lingering_" + index)
             ));
 
             index++;

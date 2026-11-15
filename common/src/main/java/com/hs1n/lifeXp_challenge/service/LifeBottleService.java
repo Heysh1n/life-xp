@@ -4,13 +4,18 @@ import com.hs1n.lifeXp_challenge.item.LifeBottleItem;
 import com.hs1n.lifeXp_challenge.registry.ModDataComponents;
 import com.hs1n.lifeXp_challenge.registry.ModItems;
 import com.hs1n.lifeXp_challenge.util.MessageUtils;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+//? if >= 26.1 {
 import net.minecraft.world.level.gamerules.GameRules;
+//?} else {
+/*import net.minecraft.world.level.GameRules;*/
+//?}
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +45,11 @@ public final class LifeBottleService {
      * @return true, если инвентарь был упакован в бутылёк и стандартный дроп отменяется.
      */
     public static boolean handleDeathInventory(ServerPlayer player) {
+//? if >= 26.1 {
         if (player.level().getGameRules().get(GameRules.KEEP_INVENTORY)) {
+//?} else {
+        /*if (player.level() instanceof ServerLevel serverLevel && serverLevel.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {*/
+//?}
             return false;
         }
 
@@ -154,16 +163,29 @@ public final class LifeBottleService {
 
         // 5. Проверка защиты от падения в пустоту (Void Protection)
         DamageSource damageSource = player.getLastDamageSource();
+//? if >= 1.21.4 {
         boolean isVoid = (damageSource != null && damageSource.is(DamageTypes.FELL_OUT_OF_WORLD))
                 || player.getY() < player.level().getMinY();
+//?} else {
+      /*boolean isVoid = (damageSource != null && damageSource.is(DamageTypes.FELL_OUT_OF_WORLD))
+                || player.getY() < player.level().getMinBuildHeight();*/
+//?}
 
         if (isVoid) {
             storeVoidBottle(player.getUUID(), filledBottle);
             MessageUtils.sendInfo(player, "lifexp.message.bottle_void_saved");
         } else {
+//? if >= 1.21.4 {
             double spawnY = Math.max(player.getY(), player.level().getMinY() + 1.0);
+//?} else {
+          /*double spawnY = Math.max(player.getY(), player.level().getMinBuildHeight() + 1.0);*/
+//?}
             ItemEntity entity = new ItemEntity(player.level(), player.getX(), spawnY, player.getZ(), filledBottle);
-            entity.setInvulnerable(true);
+//? if >= 26.3 {
+            entity.setPermanentlyInvulnerable(true);
+//?} else {
+            /*entity.setInvulnerable(true);*/
+//?}
             entity.setUnlimitedLifetime();
             entity.setPickUpDelay(10);
             player.level().addFreshEntity(entity);

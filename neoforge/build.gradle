@@ -22,24 +22,56 @@ repositories {
     maven { url "https://thedarkcolour.github.io/KotlinForForge/" }
 }
 
+def currentMc = rootProject.findProperty("minecraft_version")?.toString() ?: ""
+def isObfuscated = currentMc.startsWith("1.")
+
 dependencies {
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
-    api "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
+    if (isObfuscated) {
+        modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
 
-    common(project(path: ":common")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
+        common(project(path: ":common")) { transitive false }
+        shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
 
-    compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
-    runtimeOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
-    runtimeOnly "mezz.jei:jei-26.2-neoforge:${rootProject.jei_version}"
+        modCompileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+        modRuntimeOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+        if (rootProject.minecraft_version != "1.21.4") {
+            modLocalRuntime "mezz.jei:jei-${rootProject.minecraft_version}-neoforge:${rootProject.jei_version}"
+        }
+        forgeRuntimeLibrary "org.quiltmc.parsers:json:0.2.1"
+        forgeRuntimeLibrary "org.quiltmc.parsers:gson:0.2.1"
+    } else {
+        api "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
 
-    runtimeOnly "org.quiltmc.parsers:json:0.2.1"
-    runtimeOnly "org.quiltmc.parsers:gson:0.2.1"
+        common(project(path: ":common")) { transitive false }
+        shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
+
+        compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+        runtimeOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-neoforge"
+        if (rootProject.minecraft_version != "1.21.4") {
+            runtimeOnly "mezz.jei:jei-${rootProject.minecraft_version}-neoforge:${rootProject.jei_version}"
+        }
+        runtimeOnly "org.quiltmc.parsers:json:0.2.1"
+        runtimeOnly "org.quiltmc.parsers:gson:0.2.1"
+    }
 }
 
-shadowJar {
-    configurations = [project.configurations.shadowCommon]
-    archiveClassifier.set("neoforge")
+if (isObfuscated) {
+    shadowJar {
+        configurations = [project.configurations.shadowCommon]
+        archiveClassifier.set("dev-shadow")
+    }
+
+    remapJar {
+        input.set shadowJar.archiveFile
+        dependsOn shadowJar
+        archiveClassifier.set("neoforge")
+    }
+} else {
+    shadowJar {
+        configurations = [project.configurations.shadowCommon]
+        archiveClassifier.set("neoforge")
+    }
 }
 
 processResources {

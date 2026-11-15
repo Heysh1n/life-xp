@@ -11,14 +11,28 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.server.level.ServerPlayer;
 
 public class LifeXpNetworking {
 
+//? if >= 26.1 {
+    private static Identifier netId(String name) {
+        return Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, name);
+    }
+//?} else {
+  /*private static ResourceLocation netId(String name) {
+        return ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, name);
+    }*/
+//?}
+
     public record SyncStreakPayload(int streak) implements CustomPacketPayload {
         public static final Type<SyncStreakPayload> TYPE =
-                new Type<>(Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "sync_streak"));
+                new Type<>(netId("sync_streak"));
         public static final StreamCodec<ByteBuf, SyncStreakPayload> STREAM_CODEC =
                 StreamCodec.composite(
                         ByteBufCodecs.VAR_INT, SyncStreakPayload::streak,
@@ -33,7 +47,7 @@ public class LifeXpNetworking {
 
     public record OpenPresetScreenPayload() implements CustomPacketPayload {
         public static final Type<OpenPresetScreenPayload> TYPE =
-                new Type<>(Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "open_preset_screen"));
+                new Type<>(netId("open_preset_screen"));
         public static final StreamCodec<ByteBuf, OpenPresetScreenPayload> STREAM_CODEC =
                 StreamCodec.unit(new OpenPresetScreenPayload());
 
@@ -45,7 +59,7 @@ public class LifeXpNetworking {
 
     public record ChoosePresetPayload(String presetName) implements CustomPacketPayload {
         public static final Type<ChoosePresetPayload> TYPE =
-                new Type<>(Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "choose_preset"));
+                new Type<>(netId("choose_preset"));
         public static final StreamCodec<ByteBuf, ChoosePresetPayload> STREAM_CODEC =
                 StreamCodec.composite(
                         ByteBufCodecs.STRING_UTF8, ChoosePresetPayload::presetName,
@@ -60,7 +74,7 @@ public class LifeXpNetworking {
 
     public record ForceSyncAttributesPayload() implements CustomPacketPayload {
         public static final Type<ForceSyncAttributesPayload> TYPE =
-                new Type<>(Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "force_sync_attributes"));
+                new Type<>(netId("force_sync_attributes"));
         public static final StreamCodec<ByteBuf, ForceSyncAttributesPayload> STREAM_CODEC =
                 StreamCodec.unit(new ForceSyncAttributesPayload());
 
@@ -89,9 +103,13 @@ public class LifeXpNetworking {
                 NetworkManager.Side.C2S, ChoosePresetPayload.TYPE, ChoosePresetPayload.STREAM_CODEC, (payload, context) -> {
                     context.queue(() -> {
                         if (context.getPlayer() instanceof ServerPlayer player) {
-                            if (LifeXpPresets.apply(payload.presetName())) {
-                                LifeXpConfig.save();
-                                AttributeService.recalculate(player);
+                            if (!LifeXpConfig.INSTANCE.isPresetInitialized() || System.currentTimeMillis() > LifeXpConfig.INSTANCE.getPresetLockedUntil()) {
+                                if (LifeXpPresets.apply(payload.presetName())) {
+                                    LifeXpConfig.INSTANCE.setPresetInitialized(true);
+                                    LifeXpConfig.INSTANCE.setPresetLockedUntil(System.currentTimeMillis() + (72L * 60 * 60 * 1000));
+                                    LifeXpConfig.save();
+                                    AttributeService.recalculate(player);
+                                }
                             }
                             player.addTag(LifeXpCommand.PRESET_TAG);
                         }

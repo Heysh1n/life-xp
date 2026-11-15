@@ -14,18 +14,35 @@ import java.util.List;
  * Устанавливает кастомный компонент STORED_XP со случайным значением 5-40.
  */
 public class SetDynamicXpBottleStoredXpFunction extends LootItemConditionalFunction {
+//? if >= 26.3 {
     public static final MapCodec<SetDynamicXpBottleStoredXpFunction> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> commonFields(instance).apply(instance, SetDynamicXpBottleStoredXpFunction::new)
+    );
+
+    public SetDynamicXpBottleStoredXpFunction(java.util.Optional<net.minecraft.core.Holder<LootItemCondition>> predicates) {
+        super(predicates);
+    }
+//?} else {
+    /*public static final MapCodec<SetDynamicXpBottleStoredXpFunction> CODEC = RecordCodecBuilder.mapCodec(
             instance -> commonFields(instance).apply(instance, SetDynamicXpBottleStoredXpFunction::new)
     );
 
     public SetDynamicXpBottleStoredXpFunction(List<LootItemCondition> predicates) {
         super(predicates);
-    }
+    }*/
+//?}
 
+//? if >= 26.1 {
     @Override
     public MapCodec<? extends LootItemConditionalFunction> codec() {
         return CODEC;
     }
+//?} else {
+  /*@Override
+    public net.minecraft.world.level.storage.loot.functions.LootItemFunctionType<SetDynamicXpBottleStoredXpFunction> getType() {
+        return com.hs1n.lifeXp_challenge.registry.ModLootRegistries.SET_DYNAMIC_XP_BOTTLE_STORED_XP.get();
+    }*/
+//?}
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {

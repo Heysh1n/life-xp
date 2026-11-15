@@ -51,12 +51,21 @@ public abstract class ExperienceOrbMixin {
             ExperienceOrbAccessor otherAccessor = (ExperienceOrbAccessor) other;
             this.lifeXp$invokeSetValue(this.getValue() + other.getValue() * Math.max(1, otherAccessor.lifeXp$getCount()));
             this.count = 1;
+//? if >= 26.1 {
             if (other.entityTags().contains("life_xp_ore")) {
                 self.addTag("life_xp_ore");
             }
             if (other.entityTags().contains("life_xp_fishing")) {
                 self.addTag("life_xp_fishing");
             }
+//?} else {
+          /*if (other.getTags().contains("life_xp_ore")) {
+                self.addTag("life_xp_ore");
+            }
+            if (other.getTags().contains("life_xp_fishing")) {
+                self.addTag("life_xp_fishing");
+            }*/
+//?}
             other.discard();
         }
     }
@@ -65,11 +74,19 @@ public abstract class ExperienceOrbMixin {
     private void lifeXp$onPlayerTouchOrb(Player player, CallbackInfo ci) {
         if (player instanceof ServerPlayer serverPlayer) {
             ExperienceOrb orb = (ExperienceOrb) (Object) this;
+//? if >= 26.1 {
             if (orb.entityTags().contains("life_xp_ore")) {
                 AdvancementService.addOreXp(serverPlayer, this.getValue());
             } else if (orb.entityTags().contains("life_xp_fishing")) {
                 AdvancementService.addFishingXp(serverPlayer, this.getValue());
             }
+//?} else {
+          /*if (orb.getTags().contains("life_xp_ore")) {
+                AdvancementService.addOreXp(serverPlayer, this.getValue());
+            } else if (orb.getTags().contains("life_xp_fishing")) {
+                AdvancementService.addFishingXp(serverPlayer, this.getValue());
+            }*/
+//?}
         }
     }
 }

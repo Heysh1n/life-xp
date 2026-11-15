@@ -8,6 +8,10 @@ public final class ClientNetworkingHelper {
 
     public static void openPresetScreen() {
         Minecraft mc = Minecraft.getInstance();
+//? if >= 26.1 {
         mc.setScreenAndShow(new PresetSelectionScreen());
+//?} else {
+      /*mc.setScreen(new PresetSelectionScreen());*/
+//?}
     }
 }

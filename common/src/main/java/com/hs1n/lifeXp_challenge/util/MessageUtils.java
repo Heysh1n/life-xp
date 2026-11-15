@@ -33,18 +33,34 @@ public final class MessageUtils {
     }
 
     public static void sendInfo(Player player, String translationKey, Object... args) {
+//? if >= 26.1 {
         player.sendSystemMessage(info(translationKey, args));
+//?} else {
+        /*player.displayClientMessage(info(translationKey, args), false);*/
+//?}
     }
 
     public static void sendError(Player player, String translationKey, Object... args) {
+//? if >= 26.1 {
         player.sendSystemMessage(error(translationKey, args));
+//?} else {
+        /*player.displayClientMessage(error(translationKey, args), false);*/
+//?}
     }
 
     public static void sendActionBarError(Player player, String translationKey, Object... args) {
+//? if >= 26.1 {
         player.sendOverlayMessage(error(translationKey, args));
+//?} else {
+      /*player.displayClientMessage(error(translationKey, args), true);*/
+//?}
     }
 
     public static void sendActionBarInfo(Player player, String translationKey, Object... args) {
+//? if >= 26.1 {
         player.sendOverlayMessage(info(translationKey, args));
+//?} else {
+      /*player.displayClientMessage(info(translationKey, args), true);*/
+//?}
     }
 }

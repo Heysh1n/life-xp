@@ -7,11 +7,17 @@ import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+//? if >= 26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;*/
+//?}
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -23,8 +29,13 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class LifeXpVisualsClient {
 
+//? if >= 26.1 {
     public static final Identifier VIGNETTE =
             Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "textures/gui/vignette.png");
+//?} else {
+  /*public static final ResourceLocation VIGNETTE =
+            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "textures/gui/vignette.png");*/
+//?}
 
     public static final int ARGB_MASK = 0xFF000000;
 
@@ -59,9 +70,20 @@ public final class LifeXpVisualsClient {
     //  Виньетка
     // ═══════════════════════════════════════════════════════════
 
+//? if >= 26.2 {
+    private static boolean isVignetteHidden(Minecraft mc) {
+        return mc.player == null || mc.gui.hud.isHidden();
+    }
+//?} else {
+  /*private static boolean isVignetteHidden(Minecraft mc) {
+        return mc.player == null;
+    }*/
+//?}
+
+//? if >= 26.1 {
     private static void renderVignette(GuiGraphicsExtractor guiGraphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.gui.hud.isHidden()) return;
+        if (isVignetteHidden(mc)) return;
 
         LocalPlayer player = mc.player;
         if (player.isSpectator() || player.isCreative() || player.isDeadOrDying()) return;
@@ -82,6 +104,60 @@ public final class LifeXpVisualsClient {
         int color = (alphaInt << 24) | 0x00FFFFFF;
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIGNETTE, 0, 0, 0.0F, 0.0F, screenWidth, screenHeight, screenWidth, screenHeight, color);
     }
+//?}
+
+//? if == 1.21.4 {
+    /*private static void renderVignette(GuiGraphics guiGraphics, DeltaTracker delta) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.options.hideGui) return;
+
+        LocalPlayer player = mc.player;
+        if (player.isSpectator() || player.isCreative() || player.isDeadOrDying()) return;
+
+        LifeXpConfig config = LifeXpConfig.INSTANCE;
+        int maxLevel = Math.max(1, config.getMaxLevel());
+        float currentXp = player.experienceLevel;
+
+        float halfCap = maxLevel * 0.5F;
+        float alpha = Math.clamp(1.0F - (currentXp / halfCap), 0.0F, 1.0F);
+        if (alpha <= 0.001F) return;
+
+        int screenWidth  = guiGraphics.guiWidth();
+        int screenHeight = guiGraphics.guiHeight();
+
+        int alphaInt = Math.clamp((int) (alpha * 255.0F), 0, 255);
+        int color = (alphaInt << 24) | 0x00FFFFFF;
+        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, VIGNETTE, 0, 0, 0.0F, 0.0F, screenWidth, screenHeight, screenWidth, screenHeight, color);
+    }*/
+//?}
+
+//? if <= 1.21.1 {
+    /*private static void renderVignette(GuiGraphics guiGraphics, DeltaTracker delta) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.options.hideGui) return;
+
+        LocalPlayer player = mc.player;
+        if (player.isSpectator() || player.isCreative() || player.isDeadOrDying()) return;
+
+        LifeXpConfig config = LifeXpConfig.INSTANCE;
+        int maxLevel = Math.max(1, config.getMaxLevel());
+        float currentXp = player.experienceLevel;
+
+        float halfCap = maxLevel * 0.5F;
+        float alpha = Math.clamp(1.0F - (currentXp / halfCap), 0.0F, 1.0F);
+        if (alpha <= 0.001F) return; // Полностью прозрачна — пропускаем рендер
+
+        int screenWidth  = guiGraphics.guiWidth();
+        int screenHeight = guiGraphics.guiHeight();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, alpha);
+        guiGraphics.blit(VIGNETTE, 0, 0, 0, 0, screenWidth, screenHeight, screenWidth, screenHeight);
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.disableBlend();
+    }*/
+//?}
 
     // ═══════════════════════════════════════════════════════════
     //  Частицы пепла

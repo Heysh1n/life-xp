@@ -4,7 +4,11 @@ import com.hs1n.lifeXp_challenge.util.ExperienceOrbHelper;
 import com.hs1n.lifeXp_challenge.util.ExperienceSourceHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -33,6 +37,7 @@ public final class OreVeinMinerService {
 
     private static final int MAX_VEIN_BLOCKS = 6; // total including origin
 
+//? if >= 26.1 {
     private static final TagKey<Item> PICKAXES =
             TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("minecraft", "pickaxes"));
     private static final TagKey<Block> MINECRAFT_ORES =
@@ -49,6 +54,24 @@ public final class OreVeinMinerService {
             TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "lapis_ores"));
     private static final TagKey<Block> REDSTONE_ORES =
             TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "redstone_ores"));
+//?} else {
+  /*private static final TagKey<Item> PICKAXES =
+            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("minecraft", "pickaxes"));
+    private static final TagKey<Block> MINECRAFT_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "ores"));
+    private static final TagKey<Block> COMMON_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
+    private static final TagKey<Block> COAL_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "coal_ores"));
+    private static final TagKey<Block> DIAMOND_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    private static final TagKey<Block> EMERALD_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "emerald_ores"));
+    private static final TagKey<Block> LAPIS_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    private static final TagKey<Block> REDSTONE_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_ores"));*/
+//?}
 
     private static final BlockPos[] OFFSETS = {
             new BlockPos(1, 0, 0), new BlockPos(-1, 0, 0),

@@ -9,9 +9,19 @@ repositories {
 }
 
 dependencies {
-    implementation "dev.architectury:architectury:${rootProject.architectury_version}"
-    compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-fabric"
-    compileOnly "mezz.jei:jei-26.2-common-api:${rootProject.jei_version}"
+    def currentMc = rootProject.findProperty("minecraft_version")?.toString() ?: ""
+    def isObfuscated = currentMc.startsWith("1.")
+
+    if (isObfuscated) {
+        modImplementation "dev.architectury:architectury:${rootProject.architectury_version}"
+        modCompileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-fabric"
+    } else {
+        implementation "dev.architectury:architectury:${rootProject.architectury_version}"
+        compileOnly "dev.isxander:yet-another-config-lib:${rootProject.yacl_version}-fabric"
+    }
+
+    compileOnly "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7"
+    compileOnly "mezz.jei:jei-${rootProject.minecraft_version}-common-api:${rootProject.jei_version}"
     // EMI не имеет релиза под Minecraft 26.2 (последняя версия 1.1.24+1.21.1)
     // compileOnly "dev.emi:emi-xplat-mojmap:${rootProject.emi_version}:api"
 }

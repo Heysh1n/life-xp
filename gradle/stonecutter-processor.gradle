@@ -1,0 +1,188 @@
+class StonecutterProcessor {
+    static int compareVersions(String v1, String v2) {
+        def p1 = v1.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+        def p2 = v2.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+        int maxLen = Math.max(p1.size(), p2.size())
+        for (int i = 0; i < maxLen; i++) {
+            int n1 = i < p1.size() ? p1[i] : 0
+            int n2 = i < p2.size() ? p2[i] : 0
+            if (n1 != n2) return n1 <=> n2
+        }
+        return 0
+    }
+
+    static boolean evalCondition(String cond, String currentVersion) {
+        cond = cond.trim()
+        if (cond.contains("&&")) {
+            return cond.split("&&").every { evalCondition(it, currentVersion) }
+        }
+        if (cond.contains("||")) {
+            return cond.split("\\|\\|").any { evalCondition(it, currentVersion) }
+        }
+        if (cond.startsWith(">=")) {
+            return compareVersions(currentVersion, cond.substring(2).trim()) >= 0
+        } else if (cond.startsWith("<=")) {
+            return compareVersions(currentVersion, cond.substring(2).trim()) <= 0
+        } else if (cond.startsWith(">")) {
+            return compareVersions(currentVersion, cond.substring(1).trim()) > 0
+        } else if (cond.startsWith("<")) {
+            return compareVersions(currentVersion, cond.substring(1).trim()) < 0
+        } else if (cond.startsWith("==")) {
+            return compareVersions(currentVersion, cond.substring(2).trim()) == 0
+        } else if (cond.startsWith("!=")) {
+            return compareVersions(currentVersion, cond.substring(2).trim()) != 0
+        }
+        return false
+    }
+
+    static String processText(String text, String targetVersion) {
+        List<String> lines = text.split("\r?\n", -1) as List<String>
+        List<String> result = []
+        int i = 0
+        while (i < lines.size()) {
+            String line = lines[i]
+            String trimmed = line.trim()
+
+            if (trimmed.contains("//? if ") && trimmed.endsWith("{")) {
+                int ifIdx = line.indexOf("//? if ")
+                String prefix = line.substring(0, ifIdx)
+                String cond = trimmed.substring(trimmed.indexOf("//? if ") + 7, trimmed.length() - 1).trim()
+                boolean isIfActive = evalCondition(cond, targetVersion)
+
+                result.add(prefix + "//? if " + cond + " {")
+                i++
+
+                List<String> ifBlock = []
+                while (i < lines.size()) {
+                    String sub = lines[i].trim()
+                    if (sub.contains("//?} else") || sub.contains("//?}")) {
+                        break
+                    }
+                    ifBlock.add(lines[i])
+                    i++
+                }
+
+                result.addAll(formatBlock(ifBlock, isIfActive))
+
+                if (i < lines.size() && lines[i].trim().contains("//?} else")) {
+                    result.add(prefix + "//?} else {")
+                    i++
+
+                    List<String> elseBlock = []
+                    while (i < lines.size()) {
+                        String sub = lines[i].trim()
+                        if (sub.contains("//?}")) {
+                            break
+                        }
+                        elseBlock.add(lines[i])
+                        i++
+                    }
+                    result.addAll(formatBlock(elseBlock, !isIfActive))
+                }
+
+                if (i < lines.size() && lines[i].trim().contains("//?}")) {
+                    result.add(prefix + "//?}")
+                    i++
+                }
+            } else if (trimmed.startsWith("//? if ") && !trimmed.endsWith("{")) {
+                String cond = trimmed.substring(7).trim()
+                boolean isActive = evalCondition(cond, targetVersion)
+                result.add(line)
+                i++
+                if (i < lines.size()) {
+                    String nextLine = lines[i]
+                    if (isActive) {
+                        if (nextLine.trim().startsWith("//") && !nextLine.trim().startsWith("//?")) {
+                            int commentIdx = nextLine.indexOf("//")
+                            result.add(nextLine.substring(0, commentIdx) + nextLine.substring(commentIdx + 2))
+                        } else {
+                            result.add(nextLine)
+                        }
+                    } else {
+                        if (!nextLine.trim().startsWith("//")) {
+                            result.add("//" + nextLine)
+                        } else {
+                            result.add(nextLine)
+                        }
+                    }
+                    i++
+                }
+            } else {
+                result.add(line)
+                i++
+            }
+        }
+        return result.join("\n")
+    }
+
+    private static List<String> formatBlock(List<String> block, boolean active) {
+        if (block.isEmpty()) return block
+
+        List<String> clean = []
+        for (String l : block) {
+            clean.add(l)
+        }
+        if (!clean.isEmpty()) {
+            String first = clean[0]
+            int idx = first.indexOf("/*")
+            if (idx != -1) {
+                clean[0] = first.substring(0, idx) + first.substring(idx + 2)
+            }
+        }
+        if (!clean.isEmpty()) {
+            String last = clean[clean.size() - 1]
+            int idx = last.lastIndexOf("*/")
+            if (idx != -1) {
+                clean[clean.size() - 1] = last.substring(0, idx) + last.substring(idx + 2)
+            }
+        }
+
+        if (active) {
+            return clean
+        } else {
+            if (clean.size() == 1) {
+                String line = clean[0]
+                int indent = 0
+                while (indent < line.length() && Character.isWhitespace(line.charAt(indent))) indent++
+                String prefix = line.substring(0, indent)
+                String content = line.substring(indent)
+                return [prefix + "/*" + content + "*/"]
+            } else {
+                List<String> commented = []
+                String first = clean[0]
+                int indent = 0
+                while (indent < first.length() && Character.isWhitespace(first.charAt(indent))) indent++
+                commented.add(first.substring(0, indent) + "/*" + first.substring(indent))
+                for (int j = 1; j < clean.size() - 1; j++) {
+                    commented.add(clean[j])
+                }
+                commented.add(clean[clean.size() - 1] + "*/")
+                return commented
+            }
+        }
+    }
+}
+
+ext.preprocessSourceFiles = { String targetVersion ->
+    int changedFiles = 0
+    def scanDirs = ["common/src", "fabric/src", "neoforge/src"]
+    for (String dirPath : scanDirs) {
+        File dir = rootProject.file(dirPath)
+        if (!dir.exists()) continue
+        dir.eachFileRecurse { File f ->
+            if (f.isFile() && (f.name.endsWith(".java") || f.name.endsWith(".json"))) {
+                String original = f.text
+                if (original.contains("//? if ")) {
+                    String processed = StonecutterProcessor.processText(original, targetVersion)
+                    if (processed != original) {
+                        f.text = processed
+                        changedFiles++
+                    }
+                }
+            }
+        }
+    }
+    if (changedFiles > 0) {
+        println "[Stonecutter] Обработано файлов под версию ${targetVersion}: ${changedFiles}"
+    }
+}

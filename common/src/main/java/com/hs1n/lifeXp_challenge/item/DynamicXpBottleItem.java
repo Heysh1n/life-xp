@@ -15,9 +15,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.ItemUseAnimation;
-import net.minecraft.world.level.Level;
+//? if >= 26.1 {
 import net.minecraft.world.item.component.TooltipDisplay;
+//?}
+//? if >= 1.21.4 {
+import net.minecraft.world.item.ItemUseAnimation;
+//?} else {
+/*import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.InteractionResultHolder;*/
+//?}
+import java.util.List;
+import net.minecraft.world.level.Level;
 import java.util.function.Consumer;
 
 /**
@@ -54,6 +62,7 @@ public class DynamicXpBottleItem extends Item {
         return 72000;
     }
 
+//? if >= 1.21.4 {
     @Override
     public ItemUseAnimation getUseAnimation(ItemStack stack) {
         return ItemUseAnimation.BOW;
@@ -61,15 +70,31 @@ public class DynamicXpBottleItem extends Item {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+//?} else {
+  /*@Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {*/
+//?}
         ItemStack stack = player.getItemInHand(hand);
 
         if (player.isShiftKeyDown()) {
             if (ExperienceUtils.getPlayerTotalXp(player) > 0) {
                 player.startUsingItem(hand);
+//? if >= 1.21.4 {
                 return InteractionResult.CONSUME;
             } else {
                 return InteractionResult.FAIL;
             }
+//?} else {
+              /*return InteractionResultHolder.consume(stack);
+            } else {
+                return InteractionResultHolder.fail(stack);
+            }*/
+//?}
         } else {
             // Обычный ПКМ — поглощение опыта
             int stored = getStoredXp(stack);
@@ -84,15 +109,28 @@ public class DynamicXpBottleItem extends Item {
                     stack.shrink(1);
                     ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
                     if (!player.getInventory().add(emptyBottle)) {
-                        player.drop(emptyBottle, false);
+//? if >= 26.3 {
+                        player.drop(emptyBottle, false, net.minecraft.util.Prediction.SERVER_ONLY);
+//?} else {
+                        /*player.drop(emptyBottle, false);*/
+//?}
                     }
                 }
+//? if >= 1.21.4 {
                 return InteractionResult.SUCCESS;
             }
         }
 
         return InteractionResult.PASS;
     }
+//?} else {
+              /*return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+            }
+        }
+
+        return InteractionResultHolder.pass(stack);
+    }*/
+//?}
 
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseTicks) {
@@ -142,19 +180,36 @@ public class DynamicXpBottleItem extends Item {
         return getStoredXp(stack) > 0;
     }
 
+//? if >= 26.1 {
+    private static boolean isShiftDown() {
+        return Minecraft.getInstance().hasShiftDown();
+    }
+//?} else {
+    /*private static boolean isShiftDown() {
+        return net.minecraft.client.gui.screens.Screen.hasShiftDown();
+    }*/
+//?}
+
+//? if >= 26.1 {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        Consumer<Component> out = tooltip;
+//?} else {
+  /*@Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        Consumer<Component> out = tooltip::add;*/
+//?}
         int storedXp = getStoredXp(stack);
         int approxLevels = ExperienceUtils.calculateLevelFromXp(storedXp);
 
-        tooltip.accept(Component.translatable("lifexp.xp_bottle.stored_points", storedXp, approxLevels)
+        out.accept(Component.translatable("lifexp.xp_bottle.stored_points", storedXp, approxLevels)
                 .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
 
-        if (Minecraft.getInstance().hasShiftDown()) {
-            tooltip.accept(Component.translatable("item.life_xp_challenge.dynamic_xp_bottle.desc")
+        if (isShiftDown()) {
+            out.accept(Component.translatable("item.life_xp_challenge.dynamic_xp_bottle.desc")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
-            tooltip.accept(Component.translatable("lifexp.tooltip.hold_shift")
+            out.accept(Component.translatable("lifexp.tooltip.hold_shift")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
     }

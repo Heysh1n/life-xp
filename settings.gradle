@@ -1,15 +1,102 @@
-
-
 pluginManagement {
     repositories {
         maven { url = "https://maven.fabricmc.net/" }
         maven { url = "https://maven.architectury.dev/" }
         maven { url = "https://maven.neoforged.net/releases/" }
+        maven { url = "https://maven.kikugie.dev/releases" }
         gradlePluginPortal()
     }
 }
 
+plugins {
+    id "dev.kikugie.stonecutter" version "0.5.1"
+}
+
 rootProject.name = "LIFE-XP-Challenge"
+
+// ── Авто-синхронизация версии при переключении до конфигурации проектов ──
+def versionsDir = new File(rootDir, "versions")
+def availableVersions = versionsDir.exists() ? (versionsDir.listFiles()?.findAll { 
+    it.isDirectory() && new File(it, "gradle.properties").exists() 
+}?.collect { it.name } ?: []) : []
+
+def requestedTargetVer = gradle.startParameter.projectProperties.get("to") ?: 
+                         gradle.startParameter.projectProperties.get("target") ?: 
+                         gradle.startParameter.projectProperties.get("ver") ?: 
+                         gradle.startParameter.projectProperties.get("mc")
+
+if (!requestedTargetVer) {
+    def taskNames = gradle.startParameter.taskNames
+    for (int i = 0; i < taskNames.size(); i++) {
+        def raw = taskNames[i].replaceFirst("^:", "")
+        if (raw == "to" && i + 1 < taskNames.size()) {
+            def candidate = taskNames[i + 1].replaceFirst("^:", "")
+            if (availableVersions.contains(candidate)) {
+                requestedTargetVer = candidate
+                break
+            }
+        } else if (raw.startsWith("to") && raw.length() > 2) {
+            def candidate = raw.substring(2)
+            if (availableVersions.contains(candidate)) {
+                requestedTargetVer = candidate
+                break
+            }
+        }
+    }
+}
+
+if (requestedTargetVer && availableVersions.contains(requestedTargetVer)) {
+    File verPropsFile = new File(rootDir, "versions/${requestedTargetVer}/gradle.properties")
+    if (verPropsFile.exists()) {
+        Properties verProps = new Properties()
+        verPropsFile.withInputStream { verProps.load(it) }
+
+        File rootPropsFile = new File(rootDir, "gradle.properties")
+        List<String> lines = rootPropsFile.readLines()
+        List<String> newLines = []
+        Set<String> keysToUpdate = verProps.stringPropertyNames()
+        Set<String> updatedKeys = [] as Set
+
+        for (String line : lines) {
+            String trimmed = line.trim()
+            if (trimmed.startsWith("#") || !trimmed.contains("=")) {
+                newLines.add(line)
+                continue
+            }
+            String key = trimmed.substring(0, trimmed.indexOf("=")).trim()
+            if (keysToUpdate.contains(key)) {
+                newLines.add("${key}=${verProps.getProperty(key)}")
+                updatedKeys.add(key)
+            } else {
+                newLines.add(line)
+            }
+        }
+        for (String key : keysToUpdate) {
+            if (!updatedKeys.contains(key)) {
+                newLines.add("${key}=${verProps.getProperty(key)}")
+            }
+        }
+        rootPropsFile.text = newLines.join("\n") + "\n"
+
+        File scFile = new File(rootDir, "stonecutter.gradle")
+        if (scFile.exists()) {
+            scFile.text = scFile.text.replaceAll(/stonecutter\.active\s+"[^"]+"/, "stonecutter.active \"${requestedTargetVer}\"")
+        }
+    }
+}
+
+stonecutter {
+    kotlinController = false
+    centralScript = "build.gradle"
+    shared {
+        vers "1.21.1", "1.21.1"
+        vers "1.21.4", "1.21.4"
+        vers "26.1", "26.1"
+        vers "26.2", "26.2"
+        vers "26.3", "26.3"
+    }
+    create rootProject
+}
 
 include("common")
 include("fabric")

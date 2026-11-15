@@ -11,7 +11,11 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(AnvilScreen.class)
 public abstract class MixinAnvilScreen {
 
+//? if >= 26.1 {
     @ModifyConstant(method = "extractLabels", constant = @Constant(intValue = 40))
+//?} else {
+  /*@ModifyConstant(method = "renderLabels", constant = @Constant(intValue = 40))*/
+//?}
     private int lifeXp$removeTooExpensiveLabel(int original) {
         return Integer.MAX_VALUE;
     }

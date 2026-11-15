@@ -5,7 +5,11 @@ import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.chat.Component;
+//? if >= 26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,9 +18,15 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.core.Holder;
 
 public class MilestoneService {
+//? if >= 26.1 {
     private static final Identifier MILESTONE_10 = Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_10");
     private static final Identifier MILESTONE_50 = Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_50");
     private static final Identifier MILESTONE_100 = Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_100");
+//?} else {
+  /*private static final ResourceLocation MILESTONE_10 = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_10");
+    private static final ResourceLocation MILESTONE_50 = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_50");
+    private static final ResourceLocation MILESTONE_100 = ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "main/milestone_100");*/
+//?}
 
     public static void checkMilestones(ServerPlayer player) {
         int maxLevel = LifeXpConfig.INSTANCE.getMaxLevel();
@@ -29,7 +39,11 @@ public class MilestoneService {
         if (progress >= 1.00f) grantAdvancement(player, MILESTONE_100, 100);
     }
 
+//? if >= 26.1 {
     private static void grantAdvancement(ServerPlayer player, Identifier advancementId, int percent) {
+//?} else {
+  /*private static void grantAdvancement(ServerPlayer player, ResourceLocation advancementId, int percent) {*/
+//?}
         AdvancementHolder advancement = player.level().getServer().getAdvancements().get(advancementId);
         if (advancement != null) {
             AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
