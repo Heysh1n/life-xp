@@ -103,6 +103,10 @@ public class LifeXpNetworking {
                 NetworkManager.Side.C2S, ChoosePresetPayload.TYPE, ChoosePresetPayload.STREAM_CODEC, (payload, context) -> {
                     context.queue(() -> {
                         if (context.getPlayer() instanceof ServerPlayer player) {
+                            if (!com.hs1n.lifeXp_challenge.service.PresetManager.hasOperatorPermissions(player)) {
+                                LifeXpChallenge.LOGGER.warn("[LIFE-XP] Unauthorized attempt to change preset by non-operator player {}", player.getScoreboardName());
+                                return;
+                            }
                             if (!LifeXpConfig.INSTANCE.isPresetInitialized() || System.currentTimeMillis() > LifeXpConfig.INSTANCE.getPresetLockedUntil()) {
                                 if (LifeXpPresets.apply(payload.presetName())) {
                                     LifeXpConfig.INSTANCE.setPresetInitialized(true);

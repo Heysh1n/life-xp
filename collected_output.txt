@@ -1,0 +1,719 @@
+══════════════
+📋 LIFE-XP-Challenge-Architectury [pick]
+📅 16.11.2026 09:32:39
+📄 Files: 4
+══════════════
+
+┌────────────
+│ 🗂️  STRUCTURE
+├────────────
+│ 📦 LIFE-XP-Challenge-Architectury/
+│ └── 📂 common/
+│     └── 📂 src/
+│         └── 📂 main/
+│             └── 📂 java/
+│                 └── 📂 com/
+│                     └── 📂 hs1n/
+│                         └── 📂 lifeXp_challenge/
+│                             ├── 📂 config/
+│                             │   └── 📄 LifeXpPresets.java
+│                             ├── 📂 data/
+│                             │   └── 📄 LifeXpGlobalData.java
+│                             └── 📂 service/
+│                                 ├── 📄 PresetManager.java
+│                                 └── 📄 XpHarvesterService.java
+└────────────
+
+┌─── 📄 [1/4] common/src/main/java/com/hs1n/lifeXp_challenge/config/LifeXpPresets.java
+package com.hs1n.lifeXp_challenge.config;
+
+/**
+ * Общие пресеты конфигурации, доступные и из клиентского GUI, и из серверных команд.
+ * Извлечено из LifeXpConfigScreen для устранения дублирования кода.
+ */
+public final class LifeXpPresets {
+
+    /** Имена пресетов для автодополнения команд. */
+    public static final String[] PRESET_NAMES = {"core", "vanilla_plus", "baby_mode", "real_hardcore", "core_no_streaks", "purist"};
+
+    private LifeXpPresets() {}
+
+    /**
+     * Применить пресет по имени.
+     * @return true если пресет найден и применён, false если имя неизвестно.
+     */
+    public static boolean apply(String name) {
+        return switch (name) {
+            case "core"            -> { applyCore();           yield true; }
+            case "vanilla_plus"    -> { applyVanillaPlus();    yield true; }
+            case "baby_mode"       -> { applyBabyMode();       yield true; }
+            case "real_hardcore"   -> { applyRealHardcore();    yield true; }
+            case "core_no_streaks" -> { applyCoreNoStreaks();  yield true; }
+            case "purist"          -> { applyPurist();         yield true; }
+            default -> false;
+        };
+    }
+
+    // ── Хелпер для установки значений нода ─────────────────────
+
+    private static void set(LifeXpConfig cfg, String key, double start, double mid, double end) {
+        AttributeConfigNode node = cfg.getNode(key);
+        if (node == null) return;
+        node.setStartValue(start);
+        node.setMidValue(mid);
+        node.setEndValue(end);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 1: LIFE-XP CORE — хардкорная прогрессия
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyCore() {
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setMaxLevel(1000);
+        cfg.setDeathXpTax(0.5);
+
+
+        set(cfg, "max_health",              -19.0,  -8.0,   12.0);
+        set(cfg, "movement_speed",          -0.02,   0.0,    0.02);
+        set(cfg, "attack_damage",            0.0,    1.5,    4.0);
+        set(cfg, "attack_speed",            -0.5,    0.0,    1.5);
+        set(cfg, "armor_toughness",          0.0,    3.0,    6.0);
+        set(cfg, "knockback_resistance",     0.0,    0.2,    0.5);
+        set(cfg, "block_interaction_range",  0.0,    0.5,    1.5);
+        set(cfg, "entity_interaction_range", 0.0,    0.5,    1.5);
+        set(cfg, "block_break_speed",       -0.1,    0.1,    0.4);
+        set(cfg, "sneaking_speed",           0.0,    0.05,   0.15);
+        set(cfg, "submerged_mining_speed",   0.0,    0.5,    2.0);
+        set(cfg, "sweeping_damage_ratio",    0.0,    0.15,   0.4);
+        set(cfg, "safe_fall_distance",       0.0,    1.0,    3.0);
+        set(cfg, "oxygen_bonus",             2.0,    0.0,   -1.0);
+        set(cfg, "burning_time",            -0.5,    0.0,    1.5);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 2: Vanilla+ (Half of LXP Core)
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyVanillaPlus() {
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setMaxLevel(500);
+        cfg.setDeathXpTax(0.5);
+
+        set(cfg, "max_health",              -14.0,  -6.0,    4.0);
+        set(cfg, "movement_speed",           0.0,    0.005,  0.015);
+        set(cfg, "attack_damage",            0.0,    1.0,    2.5);
+        set(cfg, "attack_speed",             0.0,    0.3,    0.8);
+        set(cfg, "armor_toughness",          0.0,    2.0,    4.0);
+        set(cfg, "knockback_resistance",     0.0,    0.1,    0.25);
+        set(cfg, "block_interaction_range",  0.0,    0.3,    0.8);
+        set(cfg, "entity_interaction_range", 0.0,    0.3,    0.8);
+        set(cfg, "block_break_speed",        0.0,    0.1,    0.3);
+        set(cfg, "sneaking_speed",           0.0,    0.03,   0.1);
+        set(cfg, "submerged_mining_speed",   0.0,    0.5,    1.5);
+        set(cfg, "sweeping_damage_ratio",    0.0,    0.1,    0.3);
+        set(cfg, "safe_fall_distance",       0.0,    0.5,    1.5);
+        set(cfg, "oxygen_bonus",             0.0,    0.0,    0.0);
+        set(cfg, "burning_time",             0.0,    0.0,    0.0);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 3: BabyMode — для новичков
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyBabyMode() {
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setMaxLevel(200);
+        cfg.setDeathXpTax(0.8);
+
+        set(cfg, "max_health",               0.0,   20.0,   40.0);
+        set(cfg, "movement_speed",           0.0,    0.05,   0.1);
+        set(cfg, "attack_damage",            2.0,    5.0,   10.0);
+        set(cfg, "attack_speed",             0.5,    1.5,    3.0);
+        set(cfg, "armor_toughness",          2.0,    6.0,   12.0);
+        set(cfg, "knockback_resistance",     0.2,    0.5,    0.8);
+        set(cfg, "block_interaction_range",  0.5,    1.5,    3.0);
+        set(cfg, "entity_interaction_range", 0.5,    1.5,    3.0);
+        set(cfg, "block_break_speed",        0.2,    0.5,    1.0);
+        set(cfg, "sneaking_speed",           0.05,   0.15,   0.3);
+        set(cfg, "submerged_mining_speed",   0.5,    2.0,    4.0);
+        set(cfg, "sweeping_damage_ratio",    0.1,    0.3,    0.6);
+        set(cfg, "safe_fall_distance",       1.0,    3.0,    6.0);
+        set(cfg, "oxygen_bonus",             1.0,    2.0,    3.0);
+        set(cfg, "burning_time",            -0.3,   -0.5,   -0.7);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 4: Real Hardcore (Пукан в огне)
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyRealHardcore() {
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setMaxLevel(10000);
+        cfg.setDeathXpTax(0.2);
+
+        set(cfg, "max_health",              -19.0,  -10.0,   0.0);
+        set(cfg, "movement_speed",          -0.03,  -0.01,   0.0);
+        set(cfg, "attack_damage",           -0.5,    0.0,    1.0);
+        set(cfg, "attack_speed",            -1.0,   -0.3,    0.0);
+        set(cfg, "armor_toughness",          0.0,    1.0,    3.0);
+        set(cfg, "knockback_resistance",     0.0,    0.05,   0.15);
+        set(cfg, "block_interaction_range", -0.5,    0.0,    0.5);
+        set(cfg, "entity_interaction_range",-0.5,    0.0,    0.5);
+        set(cfg, "block_break_speed",       -0.2,   -0.05,   0.1);
+        set(cfg, "sneaking_speed",          -0.05,   0.0,    0.05);
+        set(cfg, "submerged_mining_speed",  -0.5,    0.0,    0.5);
+        set(cfg, "sweeping_damage_ratio",    0.0,    0.05,   0.15);
+        set(cfg, "safe_fall_distance",      -1.0,    0.0,    1.0);
+        set(cfg, "oxygen_bonus",            -1.0,   -0.5,    0.0);
+        set(cfg, "burning_time",             2.0,    1.0,    0.0);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 5: Core (No Streaks) — без множителя серии убийств
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyCoreNoStreaks() {
+        applyCore();
+        LifeXpConfig.INSTANCE.setEnableKillStreak(false);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  Пресет 6: Purist (Classic) — чистый ванильный хардкор
+    // ════════════════════════════════════════════════════════════
+
+    public static void applyPurist() {
+        applyCore();
+        LifeXpConfig cfg = LifeXpConfig.INSTANCE;
+        cfg.setEnableKillStreak(false);
+        cfg.setDeathXpTax(1.0);
+    }
+}
+└────────────────────────────────────────
+
+┌─── 📄 [2/4] common/src/main/java/com/hs1n/lifeXp_challenge/data/LifeXpGlobalData.java
+package com.hs1n.lifeXp_challenge.data;
+
+import com.hs1n.lifeXp_challenge.LifeXpChallenge;
+import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
+import com.mojang.serialization.Codec;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+//? if >= 26.1 {
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.saveddata.SavedDataType;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.saveddata.SavedData;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Глобальное хранилище данных мода LIFE-XP с системой "Двойного маппинга" (Dual-Key Identity Linking).
+ * Решает проблему смены UUID на пиратских лаунчерах (Ely.by) и смены никнеймов на лицензии.
+ * Файл сохранения: world/data/lifexp_players.dat
+ */
+public class LifeXpGlobalData extends SavedData {
+
+    public static final String DATA_NAME = "lifexp_players";
+
+    private final Map<String, CompoundTag> accounts = new ConcurrentHashMap<>();
+    private final Map<UUID, String> uuidLinker = new ConcurrentHashMap<>();
+    private final Map<String, String> nameLinker = new ConcurrentHashMap<>();
+
+    public LifeXpGlobalData() {
+    }
+
+    public static final Codec<LifeXpGlobalData> CODEC = CompoundTag.CODEC.xmap(
+            LifeXpGlobalData::load,
+            data -> data.save(new CompoundTag())
+    );
+
+//? if >= 26.1 {
+    public static final SavedDataType<LifeXpGlobalData> TYPE = new SavedDataType<>(
+            Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, DATA_NAME),
+            LifeXpGlobalData::new,
+            CODEC,
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
+    );
+
+    public static LifeXpGlobalData get(ServerLevel level) {
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
+    }
+//?} else {
+  /*public static final SavedData.Factory<LifeXpGlobalData> FACTORY = new SavedData.Factory<>(
+            LifeXpGlobalData::new,
+            (tag, provider) -> load(tag),
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
+    );
+
+    public static LifeXpGlobalData get(ServerLevel level) {
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY, DATA_NAME);
+    }*/
+//?}
+
+    public static LifeXpGlobalData get(MinecraftServer server) {
+        return get(server.overworld());
+    }
+
+    public Map<String, CompoundTag> getAccounts() {
+        return accounts;
+    }
+
+    public Map<UUID, String> getUuidLinker() {
+        return uuidLinker;
+    }
+
+    public Map<String, String> getNameLinker() {
+        return nameLinker;
+    }
+
+    /**
+     * Алгоритм двойного маппинга (Dual-Key Identity Linking):
+     * 1. Проверяем uuidLinker -> если есть, обновляем nameLinker новым ником (смена ника на лицензии).
+     * 2. Проверяем nameLinker -> если есть, обновляем uuidLinker новым UUID (скачущий UUID на пиратке).
+     * 3. Новый игрок -> генерируем Internal_Account_ID, связываем в обоих мапах и создаём CompoundTag.
+     */
+    public synchronized String resolveAccountId(UUID uuid, String rawName) {
+        String name = rawName.toLowerCase(Locale.ROOT);
+        String internalId;
+
+        // ШАГ 1: Проверяем uuidLinker
+        if (uuidLinker.containsKey(uuid)) {
+            internalId = uuidLinker.get(uuid);
+            nameLinker.put(name, internalId);
+            setDirty();
+        }
+        // ШАГ 2: Проверяем nameLinker
+        else if (nameLinker.containsKey(name)) {
+            internalId = nameLinker.get(name);
+            uuidLinker.put(uuid, internalId);
+            setDirty();
+        }
+        // ШАГ 3: Новый игрок
+        else {
+            internalId = UUID.randomUUID().toString();
+            uuidLinker.put(uuid, internalId);
+            nameLinker.put(name, internalId);
+            accounts.put(internalId, new CompoundTag());
+            setDirty();
+        }
+
+        return internalId;
+    }
+
+    /**
+     * Принудительная загрузка данных мода при входе игрока (игнорируя сброс ванильного NBT).
+     */
+    public synchronized void onPlayerJoin(ServerPlayer player) {
+        UUID uuid = player.getUUID();
+        String name = player.getScoreboardName();
+        String internalId = resolveAccountId(uuid, name);
+
+        CompoundTag accountData = accounts.computeIfAbsent(internalId, k -> new CompoundTag());
+
+        // Восстановление опыта мода
+        if (accountData.contains("TotalXp")) {
+//? if >= 26.1 {
+            long totalXp = accountData.getLongOr("TotalXp", 0L);
+//?} else {
+          /*long totalXp = accountData.getLong("TotalXp");*/
+//?}
+            ExperienceUtils.setPlayerTotalXp(player, totalXp);
+        } else {
+            accountData.putLong("TotalXp", ExperienceUtils.getPlayerTotalXp(player));
+            setDirty();
+        }
+
+        // Восстановление тегов мода (килл-стрик, пресеты, флаги)
+        if (accountData.contains("Tags")) {
+//? if >= 26.1 {
+            ListTag tagsTag = accountData.getListOrEmpty("Tags");
+            for (Tag tag : tagsTag) {
+                tag.asString().ifPresent(player::addTag);
+            }
+//?} else {
+          /*ListTag tagsTag = accountData.getList("Tags", 8);
+            for (int i = 0; i < tagsTag.size(); i++) {
+                player.addTag(tagsTag.getString(i));
+            }*/
+//?}
+        }
+    }
+
+    /**
+     * Сохранение данных мода для игрока в глобальную базу.
+     */
+    public synchronized void savePlayerData(ServerPlayer player) {
+        UUID uuid = player.getUUID();
+        String internalId = uuidLinker.get(uuid);
+        if (internalId == null) {
+            String name = player.getScoreboardName().toLowerCase(Locale.ROOT);
+            internalId = nameLinker.get(name);
+        }
+        if (internalId == null) {
+            internalId = resolveAccountId(uuid, player.getScoreboardName());
+        }
+
+        CompoundTag accountData = accounts.computeIfAbsent(internalId, k -> new CompoundTag());
+        accountData.putLong("TotalXp", ExperienceUtils.getPlayerTotalXp(player));
+
+        ListTag tagsTag = new ListTag();
+//? if >= 26.1 {
+        for (String tag : player.entityTags()) {
+//?} else {
+      /*for (String tag : player.getTags()) {*/
+//?}
+            if (tag.startsWith("lifexp_")) {
+                tagsTag.add(StringTag.valueOf(tag));
+            }
+        }
+        accountData.put("Tags", tagsTag);
+        setDirty();
+    }
+
+    public synchronized void onPlayerQuit(ServerPlayer player) {
+        savePlayerData(player);
+    }
+
+    public synchronized void saveAll(MinecraftServer server) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            savePlayerData(player);
+        }
+    }
+
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        CompoundTag accountsTag = new CompoundTag();
+        for (Map.Entry<String, CompoundTag> entry : accounts.entrySet()) {
+            accountsTag.put(entry.getKey(), entry.getValue().copy());
+        }
+        tag.put("Accounts", accountsTag);
+
+        CompoundTag uuidTag = new CompoundTag();
+        for (Map.Entry<UUID, String> entry : uuidLinker.entrySet()) {
+            uuidTag.putString(entry.getKey().toString(), entry.getValue());
+        }
+        tag.put("UuidLinker", uuidTag);
+
+        CompoundTag nameTag = new CompoundTag();
+        for (Map.Entry<String, String> entry : nameLinker.entrySet()) {
+            nameTag.putString(entry.getKey(), entry.getValue());
+        }
+        tag.put("NameLinker", nameTag);
+
+        return tag;
+    }
+
+    public CompoundTag save(CompoundTag tag) {
+        return save(tag, null);
+    }
+
+    public static LifeXpGlobalData load(CompoundTag tag, HolderLookup.Provider registries) {
+        LifeXpGlobalData data = new LifeXpGlobalData();
+
+//? if >= 26.1 {
+        CompoundTag accountsTag = tag.getCompoundOrEmpty("Accounts");
+        for (String id : accountsTag.keySet()) {
+            accountsTag.getCompound(id).ifPresent(accTag -> data.accounts.put(id, accTag.copy()));
+        }
+
+        CompoundTag uuidTag = tag.getCompoundOrEmpty("UuidLinker");
+        for (String uuidStr : uuidTag.keySet()) {
+            try {
+                UUID u = UUID.fromString(uuidStr);
+                uuidTag.getString(uuidStr).ifPresent(id -> data.uuidLinker.put(u, id));
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        CompoundTag nameTag = tag.getCompoundOrEmpty("NameLinker");
+        for (String name : nameTag.keySet()) {
+            nameTag.getString(name).ifPresent(id -> data.nameLinker.put(name.toLowerCase(Locale.ROOT), id));
+        }
+//?} else {
+      /*CompoundTag accountsTag = tag.getCompound("Accounts");
+        for (String id : accountsTag.getAllKeys()) {
+            data.accounts.put(id, accountsTag.getCompound(id).copy());
+        }
+
+        CompoundTag uuidTag = tag.getCompound("UuidLinker");
+        for (String uuidStr : uuidTag.getAllKeys()) {
+            try {
+                UUID u = UUID.fromString(uuidStr);
+                data.uuidLinker.put(u, uuidTag.getString(uuidStr));
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        CompoundTag nameTag = tag.getCompound("NameLinker");
+        for (String name : nameTag.getAllKeys()) {
+            data.nameLinker.put(name.toLowerCase(Locale.ROOT), nameTag.getString(name));
+        }*/
+//?}
+
+        return data;
+    }
+
+    public static LifeXpGlobalData load(CompoundTag tag) {
+        return load(tag, null);
+    }
+}
+└────────────────────────────────────────
+
+┌─── 📄 [3/4] common/src/main/java/com/hs1n/lifeXp_challenge/service/PresetManager.java
+package com.hs1n.lifeXp_challenge.service;
+
+import com.hs1n.lifeXp_challenge.LifeXpChallenge;
+import com.hs1n.lifeXp_challenge.command.LifeXpCommand;
+import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
+import com.hs1n.lifeXp_challenge.config.LifeXpPresets;
+import com.hs1n.lifeXp_challenge.network.LifeXpNetworking;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+
+public final class PresetManager {
+
+    private PresetManager() {}
+
+    /**
+     * Вызывается в LifecycleEvent.SERVER_STARTED.
+     * Проверяет, является ли сервер выделенным (Dedicated).
+     * Dedicated -> форсируем хардкорный пресет (Core).
+     * Integrated (одиночная игра) -> щадящий пресет (Vanilla+).
+     */
+    public static void onServerStarted(MinecraftServer server) {
+        if (!LifeXpConfig.INSTANCE.isPresetInitialized()) {
+            if (server.isDedicatedServer()) {
+                LifeXpPresets.applyCore();
+                LifeXpChallenge.LOGGER.info("[LIFE-XP] Dedicated server detected. Auto-configured HARDCORE (Core) preset.");
+            } else {
+                LifeXpPresets.applyVanillaPlus();
+                LifeXpChallenge.LOGGER.info("[LIFE-XP] Integrated server detected. Auto-configured LENIENT (Vanilla+) preset.");
+            }
+            LifeXpConfig.INSTANCE.setPresetInitialized(true);
+            LifeXpConfig.save();
+        }
+    }
+
+    /**
+     * Проверка прав оператора (Уровень 2).
+     */
+//? if >= 26.1 {
+    public static boolean hasOperatorPermissions(ServerPlayer player) {
+        return player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER);
+    }
+//?} else {
+  /*public static boolean hasOperatorPermissions(ServerPlayer player) {
+        return player.hasPermissions(2);
+    }*/
+//?}
+
+    /**
+     * Проверка наличия тега выбора пресета у игрока.
+     */
+    public static boolean hasPresetTag(ServerPlayer player) {
+//? if >= 26.1 {
+        return player.entityTags().contains(LifeXpCommand.PRESET_TAG);
+//?} else {
+      /*return player.getTags().contains(LifeXpCommand.PRESET_TAG);*/
+//?}
+    }
+
+    /**
+     * Безопасное открытие меню выбора пресета при первом входе.
+     * Открывается ТОЛЬКО если игрок имеет права оператора (hasPermissions(2)).
+     * Обычные игроки не имеют доступа и сразу помечаются тегом, предотвращая открытие меню и эксплойт.
+     */
+    public static void checkAndPromptPreset(ServerPlayer player) {
+        if (!LifeXpConfig.INSTANCE.isPresetInitialized() && !hasPresetTag(player)) {
+            if (hasOperatorPermissions(player)) {
+                LifeXpNetworking.sendOpenPresetScreen(player);
+            } else {
+                player.addTag(LifeXpCommand.PRESET_TAG);
+            }
+        }
+    }
+}
+└────────────────────────────────────────
+
+┌─── 📄 [4/4] common/src/main/java/com/hs1n/lifeXp_challenge/service/XpHarvesterService.java
+package com.hs1n.lifeXp_challenge.service;
+
+import com.hs1n.lifeXp_challenge.LifeXpChallenge;
+import com.hs1n.lifeXp_challenge.util.ExperienceOrbHelper;
+import com.hs1n.lifeXp_challenge.util.ExperienceSourceHelper;
+import com.hs1n.lifeXp_challenge.util.ExperienceUtils;
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.BlockEvent;
+import dev.architectury.utils.value.IntValue;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+//? if >= 26.1 {
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+public final class XpHarvesterService {
+
+//? if >= 26.1 {
+    public static final Identifier ENCHANTMENT_ID =
+            Identifier.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "xp_harvester");
+
+    private static final TagKey<Block> DIAMOND_ORES =
+            TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    private static final TagKey<Block> LAPIS_ORES =
+            TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    private static final TagKey<Block> REDSTONE_ORES =
+            TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "redstone_ores"));
+//?} else {
+  /*public static final ResourceLocation ENCHANTMENT_ID =
+            ResourceLocation.fromNamespaceAndPath(LifeXpChallenge.MOD_ID, "xp_harvester");
+
+    private static final TagKey<Block> DIAMOND_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "diamond_ores"));
+    private static final TagKey<Block> LAPIS_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "lapis_ores"));
+    private static final TagKey<Block> REDSTONE_ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_ores"));*/
+//?}
+
+    public static void init() {
+//? if >= 26.1 {
+        BlockEvent.BREAK.register(XpHarvesterService::onBlockBreak);
+//?} else {
+      /*BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(level, pos, state, player));*/
+//?}
+        BlockEvent.PLACE.register(XpHarvesterService::onBlockPlace);
+    }
+
+    public static EventResult onBlockPlace(Level level, BlockPos pos, BlockState state, @Nullable Entity entity) {
+        if (level instanceof ServerLevel serverLevel) {
+            if (state.is(Blocks.ANCIENT_DEBRIS)) {
+                PlacedBlockTracker tracker = PlacedBlockTracker.get(serverLevel);
+                tracker.add(pos);
+                tracker.setDirty();
+            }
+        }
+        return EventResult.pass();
+    }
+
+    public static int getHarvesterLevel(ItemStack tool) {
+        if (tool == null || tool.isEmpty()) return 0;
+        ItemEnchantments enchantments = tool.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        for (Holder<Enchantment> holder : enchantments.keySet()) {
+            if (holder.is(ENCHANTMENT_ID)) {
+                return enchantments.getLevel(holder);
+            }
+        }
+        return 0;
+    }
+
+    public static EventResult onBlockBreak(Level level, BlockPos pos, BlockState state, ServerPlayer player) {
+        if (!(level instanceof ServerLevel serverLevel) || player == null || player.isCreative()) {
+            return EventResult.pass();
+        }
+        // Skip if vein mining is in progress (prevents recursive triggers)
+        if (OreVeinMinerService.IS_VEIN_MINING.get()) {
+            return EventResult.pass();
+        }
+
+        ItemStack tool = player.getMainHandItem();
+        int enchantLevel = getHarvesterLevel(tool);
+        if (enchantLevel <= 0) {
+            return EventResult.pass();
+        }
+
+        RandomSource random = serverLevel.getRandom();
+
+        // 1. Созревший CropBlock (isMaxAge) -> спавн 1-2 ExperienceOrb.
+        if (state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state)) {
+            int totalCropXp = 1 + random.nextInt(2);
+            ExperienceOrbHelper.spawnClumpedOrb(serverLevel, Vec3.atCenterOf(pos), totalCropXp);
+            return EventResult.pass();
+        }
+
+        // 2. Ancient Debris -> 1% от общего опыта игрока, жесткий хардкап Math.min(bonus, 500).
+        if (state.is(Blocks.ANCIENT_DEBRIS)) {
+            PlacedBlockTracker tracker = PlacedBlockTracker.get(serverLevel);
+            if (tracker.contains(pos)) {
+                tracker.remove(pos);
+                tracker.setDirty();
+                return EventResult.pass();
+            }
+            long totalPlayerXp = ExperienceUtils.getPlayerTotalXp(player);
+            int bonus = (int) Math.floor(totalPlayerXp * 0.01);
+            bonus = Math.min(bonus, 500);
+            if (bonus > 0) {
+                spawnOreXp(serverLevel, Vec3.atCenterOf(pos), bonus);
+            }
+            return EventResult.pass();
+        }
+
+        // 3. Ванильные руды (железо, медь, золото, лазурит, редстоун, алмазы) -> бонусный скейлинг опыта от уровня чар.
+        int bonusXp = calculateOreBonus(state, enchantLevel, random);
+        if (bonusXp > 0) {
+            spawnOreXp(serverLevel, Vec3.atCenterOf(pos), bonusXp);
+            AdvancementService.addOreXp(player, bonusXp);
+        }
+
+        // 4. Ore Vein Miner (XP Harvester level >= 2 on pickaxe)
+        OreVeinMinerService.tryVeinMine(serverLevel, player, pos, state, tool, enchantLevel);
+
+        return EventResult.pass();
+    }
+
+    private static int calculateOreBonus(BlockState state, int level, RandomSource random) {
+        return switch (state) {
+            case BlockState s when s.is(BlockTags.IRON_ORES) || s.is(BlockTags.COPPER_ORES) -> (1 + random.nextInt(2)) * level;
+            case BlockState s when s.is(BlockTags.GOLD_ORES) -> (2 + random.nextInt(2)) * level;
+            case BlockState s when s.is(LAPIS_ORES) -> (2 + random.nextInt(4)) * level;
+            case BlockState s when s.is(REDSTONE_ORES) -> (1 + random.nextInt(5)) * level;
+            case BlockState s when s.is(DIAMOND_ORES) -> (3 + random.nextInt(5)) * level;
+            default -> 0;
+        };
+    }
+
+    private static void spawnOreXp(ServerLevel level, Vec3 pos, int amount) {
+        try {
+            ExperienceSourceHelper.IS_ORE_XP.set(true);
+            ExperienceOrbHelper.spawnClumpedOrb(level, pos, amount);
+        } finally {
+            ExperienceSourceHelper.IS_ORE_XP.set(false);
+        }
+    }
+
+    private XpHarvesterService() {}
+}
+└────────────────────────────────────────
+
+═════
+✅ End
+═════

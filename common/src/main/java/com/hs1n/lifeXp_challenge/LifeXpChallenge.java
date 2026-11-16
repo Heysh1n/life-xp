@@ -4,11 +4,14 @@ import com.hs1n.lifeXp_challenge.command.LifeXpCommand;
 import com.hs1n.lifeXp_challenge.config.LifeXpConfig;
 import com.hs1n.lifeXp_challenge.registry.ModCreativeTabs;
 import com.hs1n.lifeXp_challenge.registry.ModItems;
+import com.hs1n.lifeXp_challenge.data.LifeXpGlobalData;
 import com.hs1n.lifeXp_challenge.service.AttributeService;
 import com.hs1n.lifeXp_challenge.service.CropHarvestService;
 import com.hs1n.lifeXp_challenge.service.LifeBottleService;
+import com.hs1n.lifeXp_challenge.service.PresetManager;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.InteractionEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.EntityEvent;
 import com.hs1n.lifeXp_challenge.service.KillStreakService;
@@ -49,15 +52,24 @@ public class LifeXpChallenge {
         InteractionEvent.RIGHT_CLICK_BLOCK.register(CropHarvestService::onRightClickBlock);
 //?}
 
+        LifecycleEvent.SERVER_STARTED.register(PresetManager::onServerStarted);
+
+        LifecycleEvent.SERVER_STOPPING.register(server -> {
+            LifeXpGlobalData.get(server).saveAll(server);
+        });
+
         PlayerEvent.PLAYER_JOIN.register(player -> {
+            if (player.level().getServer() != null) {
+                LifeXpGlobalData.get(player.level().getServer()).onPlayerJoin(player);
+            }
             AttributeService.recalculate(player);
             KillStreakService.onPlayerJoin(player);
-//? if >= 26.1 {
-            if (!LifeXpConfig.INSTANCE.isPresetInitialized() && !player.entityTags().contains(LifeXpCommand.PRESET_TAG)) {
-//?} else {
-          /*if (!LifeXpConfig.INSTANCE.isPresetInitialized() && !player.getTags().contains(LifeXpCommand.PRESET_TAG)) {*/
-//?}
-                com.hs1n.lifeXp_challenge.network.LifeXpNetworking.sendOpenPresetScreen(player);
+            PresetManager.checkAndPromptPreset(player);
+        });
+
+        PlayerEvent.PLAYER_QUIT.register(player -> {
+            if (player.level().getServer() != null) {
+                LifeXpGlobalData.get(player.level().getServer()).onPlayerQuit(player);
             }
         });
 
@@ -65,6 +77,9 @@ public class LifeXpChallenge {
             AttributeService.recalculate(player);
             if (!conqueredEnd) {
                 KillStreakService.resetStreak(player);
+            }
+            if (player.level().getServer() != null) {
+                LifeXpGlobalData.get(player.level().getServer()).savePlayerData(player);
             }
         });
 

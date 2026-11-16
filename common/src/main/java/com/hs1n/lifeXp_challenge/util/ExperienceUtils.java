@@ -101,6 +101,19 @@ public final class ExperienceUtils {
 
         // Пересчёт атрибутов мода
         AttributeService.recalculate(player);
+
+        // Проверка сюжетного босс-эвента на 100 000 XP (v2.0)
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            com.hs1n.lifeXp_challenge.service.StoryEventManager.checkBossEventTrigger(serverPlayer, totalXp);
+        }
+    }
+
+    /**
+     * Добавляет игроку указанное количество очков опыта (long).
+     */
+    public static void addPlayerTotalXp(Player player, long amount) {
+        if (player == null || amount <= 0L) return;
+        setPlayerTotalXp(player, getPlayerTotalXp(player) + amount);
     }
 
     /**
